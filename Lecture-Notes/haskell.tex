@@ -479,7 +479,7 @@ by line.
     \hspace*{1.3cm}
     $\forall q \in \mathbb{N}: \bigl(q < p \rightarrow \forall n \in \mathbb{N}: n \cdot q \not\in l\bigr)$.
   \end{itemize}
-  Given a list $l$ with these properties the expression
+  Given a list $l$ with these properties, the expression
   \\[0.2cm]
   \hspace*{1.3cm}
   \texttt{sieve l}
@@ -490,7 +490,7 @@ by line.
   $\mathtt{sieve}\;l = [\; q \in l \mid q \in \mathbb{P}\;]$.
   \\[0.2cm]
   Hence, when \texttt{sieve} is called with the list of all natural number greater or equal than $2$
-  it will return the list of all prime numbers, sice $2$ is the smallest  prime numer.
+  it will return the list of all prime numbers, since $2$ is the smallest  prime numer.
 
   There is a lot going on in the definition of the function \texttt{sieve}.  We will discuss this definition
   in minute detail.
@@ -503,9 +503,9 @@ by line.
     \\[0.2cm]
     matches a list with first element \texttt{p}.  The remaining elements are collected in the list
     \texttt{ns}.  For example, if \texttt{l = [2..]}, i.e.~if $l$ is the list of all natural numbers greater or
-    equal than $2$, then the variable \texttt{p} is bound to the number $2$, while the variable \texttt{xs} is
-    bound to the list of all natural numbers greater or equal than $3$, i.e.~\texttt{xs = [3..]}.
-  \item Thwe right hand side of the function definition, i.e.~the part after the symbol ``\texttt{=}'' defines the
+    equal than $2$, then the variable \texttt{p} is bound to the number $2$, while the variable \texttt{ns} is
+    bound to the list of all natural numbers greater or equal than $3$, i.e.~\texttt{ns = [3..]}.
+  \item The right hand side of the function definition, i.e.~the part after the symbol ``\texttt{=}'' defines the
     value that is computed by the function \texttt{sieve}.  This value is computed by calling the function
     ``\texttt{:}'', which is also known as the \blue{cons} function because it \underline{cons}tructs a list.
     The operator ``\texttt{:}'' takes two arguments.  The first argument is a value \texttt{u} of some type $a$
