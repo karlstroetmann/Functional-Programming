@@ -1,0 +1,8 @@
+primes :: [Integer]
+primes = sieve [2..]
+
+sieve :: [Integer] -> [Integer]
+sieve (p:ns) = p : sieve [n | n <- ns, mod n p /= 0]
+
+main :: IO ()
+main = print $ take 1000 primes 

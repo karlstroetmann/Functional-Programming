@@ -1,0 +1,35 @@
+\begin{thebibliography}{Mer15}
+
+\bibitem[Hut16]{hutton:2016}
+Graham Hutton.
+\newblock {\em Programming in Haskell}.
+\newblock Cambridge University Press, 2nd edition, 2016.
+
+\bibitem[Lip11]{lipovaca:2011}
+Miran Lipovača.
+\newblock {\em Learn You a Haskell for Great Good!}
+\newblock No Starch Press, San Francisco, CA, 2011.
+
+\bibitem[Lot22]{lott:2022}
+Steven~F. Lott.
+\newblock {\em Functional Python Programming - Third Edition}.
+\newblock Packt Publishing, 3rd edition, 2022.
+
+\bibitem[Mer15]{mertz:2015}
+David Mertz.
+\newblock {\em Functional Programming in Python}.
+\newblock Packt Publishing, 2015.
+
+\bibitem[Rei23]{reid:2023}
+James~L. Reid.
+\newblock {\em Python Functional Programming: A Hands-on Guide To Write Clean
+  \& Powerful Applications}.
+\newblock Independently Published, 2023.
+
+\bibitem[Ski23]{skinner:2023}
+Rebecca Skinner.
+\newblock {\em Effective Haskell: Solving Real-World Problems with Strongly
+  Typed Functional Programming}.
+\newblock Pragmatic Bookshelf, 2023.
+
+\end{thebibliography}
