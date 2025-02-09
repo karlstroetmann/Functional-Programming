@@ -1,0 +1,6 @@
+*.aux
+_minted-_region_
+_minted-haskell
+_region_.log
+_region_.prv
+_region_.tex
