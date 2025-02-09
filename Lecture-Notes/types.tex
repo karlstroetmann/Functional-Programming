@@ -1,0 +1,662 @@
+\chapter{Types, Expressions, and Functions}
+In this Chapter we will give a more systematic overview of \textsl{Haskell}.  In particular, we define
+\begin{enumerate}
+\item types, and
+\item expressions,
+\item functions.
+\end{enumerate}
+At this point you might wonder why we don't also discuss statements and control structures.  The reason is
+simple:  There are no statements in \textsl{Haskell}. Everything is an expression.  Neither are there control
+structures. 
+
+Haskell is a statically typed, purely functional programming language known for its expressive type system and emphasis on immutability. In Haskell, types play a central role in the design and implementation of programs. This section discusses the primitive types available in Haskell, their properties, and how they form the building blocks for more complex types in the language.
+
+Primitive types in Haskell refer to the basic types that are built into the language and directly supported by the compiler. These types include numbers, characters, booleans, and the unit type. Understanding these types is crucial for both writing correct programs and for taking full advantage of Haskell's type system.
+
+\section{Primitive Types}
+Haskell provides several predefined types, each serving different needs with respect to performance, precision,
+and range. The main numeric types in Haskell include: 
+\begin{enumerate}[(a)]
+\item \texttt{Int} is a fixed-precision integer type, which means that its range is limited by the underlying
+      hardware. Typically, \texttt{Int} is implemented as a 32-bit or 64-bit integer. Its limited range means that
+      operations on very large numbers may result in overflow. 
+
+      \paragraph{Example Usage:}
+      \begin{lstlisting}[style=haskellstyle, language=Haskell]
+ -- Defining an integer of type Int
+ smallInt :: Int
+ smallInt = 42
+      \end{lstlisting}
+
+\item \texttt{Integer} represents arbitrary-precision integers. This means that there is no fixed upper bound
+      on the size of an \texttt{Integer} value, though operations may become slower as numbers grow larger. 
+
+\paragraph{Example Usage:}
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+-- Defining an integer of type Integer
+bigInt :: Integer
+bigInt = 123456789012345678901234567890
+\end{lstlisting}
+
+\item \texttt{Float} is the type of single-precision floating-point numbers. While it may be faster and uses less
+      memory, its precision is limited compared to \texttt{Double}. 
+
+\paragraph{Example Usage:}
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+-- Defining a floating-point number of type Float
+singlePrecision :: Float
+singlePrecision = 3.14159
+\end{lstlisting}
+
+\item \texttt{Double} is a double-precision floating-point number, offering more precision at the cost of
+      additional memory and potentially slower computation in some contexts. 
+
+\paragraph{Example Usage:}
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+-- Defining a floating-point number of type Double
+doublePrecision :: Double
+doublePrecision = 2.718281828459045
+\end{lstlisting}
+
+\item \texttt{Char} is used to represent single Unicode characters. Characters in Haskell are enclosed in single quotes.
+
+\paragraph{Example Usage:}
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+-- A character literal
+letterA :: Char
+letterA = 'A'
+\end{lstlisting}
+
+\item \texttt{Bool} represents boolean values. It has two possible values: \texttt{True} and \texttt{False}.
+
+\paragraph{Example Usage:}
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+-- A boolean literal
+isHaskellFun :: Bool
+isHaskellFun = True
+\end{lstlisting}
+
+\item The \blue{unit type} is denoted by \texttt{()}.  This type has exactly one value, which is also written
+  as \texttt{()}.  It is analogous to the concept of \textit{None} in \textsl{Python}. It is typically used
+  when a function does not need to return any  meaningful value. 
+
+\paragraph{Example Usage:}
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+-- A function that returns the unit type
+printMessage :: String -> ()
+printMessage msg = putStrLn msg
+\end{lstlisting}
+\end{enumerate}
+
+\noindent
+One of Haskell’s powerful features is its ability to perform type inference. For example, numeric literals in
+Haskell are \blue{polymorphic}, i.e. they do not have a fixed type but rather a \blue{type class}.  This
+concept will be discussed in a subsequent chapter.  For example, a literal such as \texttt{5} can be
+interpreted as an \texttt{Int}, an \texttt{Integer}, a \texttt{Float}, or a \texttt{Double}, depending on the
+context. This is achieved via type classes such as \texttt{Num}. 
+
+\paragraph{Example:}
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+-- The literal 5 is polymorphic and can be any type that is an instance of Num.
+polymorphicExample :: Num a => a
+polymorphicExample = 5
+\end{lstlisting}
+
+\section{Composite Types: Lists and Tuples}
+
+Haskell provides several composite types that allow for the grouping of values. Two of the most commonly used
+composite types are \textbf{lists} and \textbf{tuples}. Both types enable the construction of complex data
+structures by combining simpler types, yet they serve different purposes and have distinct characteristics. 
+
+\subsection{Lists}
+A \textbf{list} in Haskell is an \blue{homogeneous} ordered collection of elements.  The fact that a list is
+homogeneous means that \colorbox{yellow}{all of elements must be of the same type.} Lists are one of the most fundamental data structures in Haskell and are used extensively for
+processing sequences of data. Lists are denoted using square brackets, with elements separated by commas. For
+example, the list containing the integers 1, 2, and 3 is written as: 
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+[1, 2, 3]
+\end{lstlisting}
+If \texttt{a} is any type, then the type of a list of type \texttt{a} is written as:
+\[
+[ a ]
+\]
+Lists are the workhorse of many functional languages and Haskell is no exception.  Therefore, \textsl{Haskell}
+provides a rich set of functions for processing lists, such as \texttt{map}, \texttt{filter}, 
+\texttt{foldr} and \texttt{foldl}.  These functions will be discussed later after we have discussed the syntax
+of functions.
+
+Lists are implemented as \href{https://en.wikipedia.org/wiki/Linked_list}{linked lists}, which means that
+operations such as prepending an element (using the \texttt{:} operator) are very efficient. For example: 
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+-- Prepending 0 to an existing list:
+numbers :: [Int]
+numbers = 0 : [1, 2, 3]  -- results in [0, 1, 2, 3]
+\end{lstlisting}
+However, other operations have a linear complexity.  For example, finding the length of a list has a linear
+complexity because the whole list needs to be traversed.  This is in contrast to the programming language
+\textsl{Python}, where lists are implemented as dynamic arrays.  Hence, in Python, finding the length of a list
+has complexity $\mathcal{O}(1)$.
+
+\blue{Pattern matching} on lists is a powerful feature in Haskell. One common idiom is to match against the
+empty list \texttt{[]} or a cons cell \texttt{(x:xs)}, where \texttt{x} is the head of the list and \texttt{xs}
+is the tail. For example: 
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+sumList :: Num a => [a] -> a
+sumList []     = 0
+sumList (x:xs) = x + sumList xs
+\end{lstlisting}
+This recursive definition demonstrates how lists lend themselves naturally to inductive processing.
+
+There is another very important difference between list in \textsl{Python} and lists in \textsl{Haskell}: In
+\textsl{Haskell}, lists are \blue{immutable}, i.e.~once we have constructed a list, there is no way to change
+an element in this list.  This is similar to \textsl{tuples} in \textsl{Python}.
+
+\subsection{Tuples}
+In contrast to lists, a \textbf{tuple} is a composite type that can hold a fixed number of elements, which may
+be of \colorbox{yellow}{different} types. Tuples are written using parentheses, with elements separated by commas. For instance, the tuple:
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+("Alice", 30, True)
+\end{lstlisting}
+contains a \texttt{String}, an \texttt{Int}, and a \texttt{Bool}. The type of this tuple is written as:\\[0.2cm]
+\hspace*{1.3cm}
+\texttt{(String, Int, Bool)}
+\\[0.2cm]
+In general, the type of a tuple is denoted as:
+\\[0.2cm]
+\hspace*{1.3cm}
+$(\texttt{t}_1, \texttt{t}_2, \cdots, \texttt{t}_n)$
+\\[0.2cm]
+Here, $\texttt{t}_i$ is the type of the $i^{\textrm{th}}$ component.
+
+Unlike lists, tuples are \blue{heterogeneous}.  When declaring the type of a tuple, the size, i.e.~the number of
+elements, is also defined.  Tuples are \blue{immutable}.  In fact, every data structure in
+\textsl{Haskell} is immutable.  
+
+Tuples are particularly useful when you need to group a set of values that
+naturally belong together, such as coordinates or key-value pairs. 
+Tuples support pattern matching, which allows functions to easily deconstruct them. For example, a function that extracts the first element of a pair can be defined as:
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+first :: (a, b) -> a
+first (x, _) = x
+\end{lstlisting}
+Similarly, functions can be defined to operate on larger tuples by matching each component:
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+describePerson :: (String, Int, Bool) -> String
+describePerson (name, age, isEmployed) =
+  name ++ " is " ++ show age ++ " years old and " ++
+  (if isEmployed then "employed" else "unemployed") ++ "."
+\end{lstlisting}
+The previous example is easy to misunderstand because the function \texttt{describePerson} receives not three
+elements but rather one element, which is a tuple of three elements.
+
+
+\section{Haskell Expressions and Operators}
+In Haskell, every construct is an expression that evaluates to a value. Unlike imperative languages where
+statements perform actions, in Haskell even control constructs such as conditionals and pattern matching yield
+results. One of the most powerful features of Haskell is its flexible and composable syntax for expressions,
+which is largely governed by a rich set of infix operators. These operators come with fixed precedences and
+associativities that determine the order in which parts of an expression are evaluated. In this section we
+present a detailed discussion of Haskell’s operators, their precedence, associativity, and how they interact
+within expressions. We will also provide a comprehensive table of many common operators, together with examples
+to illustrate their usage.  
+
+Before examining the operators, it is important to recall that Haskell function application (i.e., writing
+\texttt{f x} to apply the function \texttt{f} to \texttt{x}) has the highest precedence of all operations. This
+means that in an expression like \texttt{f x + y}, the application of \texttt{f} to \texttt{x} is performed
+first, and then the addition is carried out.
+
+\subsection*{Operator Precedence and Associativity}
+The precedence of an operator indicates how tightly it binds to its operands. Operators with higher precedence
+are applied before operators with lower precedence. Associativity, on the other hand, determines how operators
+of the same precedence are grouped in the absence of explicit parentheses. For example, left-associative
+operators group from the left.  For example,
+\\[0.2cm]
+\hspace*{1.3cm}
+\texttt{a - b - c}
+\\[0.2cm]
+is interpreted as
+\\[0.2cm]
+\hspace*{1.3cm}
+\texttt{(a - b) - c}). 
+\\[0.2cm]
+Right-associative operators group from the right.  For example
+\\[0.2cm]
+\hspace*{1.3cm}
+\texttt{a \^{ } b \^{ } c}
+\\[0.2cm]
+is interpreted as
+\\[0.2cm]
+\hspace*{1.3cm}
+\texttt{a \^{ } (b \^{ } c)}).
+\\[0.2cm]
+Non-associative operators cannot be chained without explicit parentheses. 
+The following table lists many of the common operators in Haskell, along with their default precedences and
+associativities. (Note that these declarations can be found in the standard libraries and GHC documentation,
+and some operators may have additional variants defined by specific libraries.) 
+\bigskip
+
+\begin{center}
+\begin{tabular}{|l|c|l|l|}
+\hline
+\textbf{Operator} & \textbf{Precedence} & \textbf{Associativity} & \textbf{Description and Example} \\ \hline\hline
+  function  & 10 & N/A & \texttt{f x y} applies \texttt{f} to \texttt{x} and \texttt{y}. \\
+  application & & & Example: \texttt{sum [1,2,3]} \\ \hline
+  \texttt{.} & 9 & right-associative  & Function composition. \\
+   & & & Example: \texttt{(f . g) x = f (g x)} \\ \hline
+  \texttt{!!} & 9 & left-associative  & List indexing. \\
+                  & & & Example: \texttt{[10,20,30] !!\;1 = 20} \\ \hline
+\texttt{\^{ }} & 8 & right-associative  & power of natural numbers. \\
+  & & & Example: \texttt{2 \^{ } 3 = 8} \\ \hline
+  \texttt{\textasciicircum \textasciicircum } & 8 & right-associative  & floating point
+                                                                                            exponentiation \\
+  & & & Example: \texttt{9 \textasciicircum \textasciicircum\; (-0.5) = 3.0} \\ \hline
+  \texttt{*}, \texttt{/}, & 7 & left-associative  & Multiplication, floating point division \\
+  & & & Example: \texttt{6 * 7 = 42} \\ \hline
+  \texttt{\textasciigrave div\textasciigrave}, \texttt{\textasciigrave mod\textasciigrave} & 7 & left-associative & integer division/modulus. \\
+  & & & Example: \texttt{mod 8 3 = 2} \\ \hline
+  \texttt{+}, \texttt{-} & 6 & left-associative & Addition and subtraction. \\ \hline
+  \texttt{++} & 5 & right-associative  & List concatenation. \\
+  & & & Example: \texttt{[1,2] ++ [3] = [1,2,3]} \\ \hline
+  \texttt{:} & 5 & right-associative  & Cons operator for lists. \\
+  & & & Example: \texttt{1 : [2,3] = [1,2,3]} \\ \hline
+\texttt{==}, \texttt{/=} & 4 & non-associative  & Relational operators.  \\ \hline
+\texttt{<}, \texttt{<=}, \texttt{>}, \texttt{>=} & 4 & non-associative  &  \\ \hline
+\texttt{\&\&} & 3 & right-associative  & Boolean \textbf{and}.  \\ \hline
+\texttt{||} & 2 & right-associative  & Boolean \textbf{or} \\ \hline
+  \texttt{\$} & 0 & right-associative & Function application operator. \\
+  & & & Example: \texttt{f \$ x + y = f (x + y)} \\ \hline
+\end{tabular}
+\end{center}
+
+There are many more operators in Haskell.  Furthermore, we can define our own operators.  This is much more
+powerful  than the concept of operator overloading that we have in \textsl{Python}.  We will discuss the
+details later after we have discussed the definition of functions.  Finally, we can use functions as infix
+operators if we enclose them in a pair of back-quote symbols ``\texttt{\textasciigrave}''.  For example,
+\texttt{div} is a function performing integer division, but instead of writing
+\\[0.2cm]
+\hspace*{1.3cm}
+\texttt{div 8 3} \quad we can instead write \quad \texttt{8 \textasciigrave div\textasciigrave\  3}.
+\\[0.2cm]
+It is important to understand that function application has the highest precedence. For example, in the expression
+\[
+\texttt{f x + y}
+\]
+the function \texttt{f} is applied to \texttt{x} before adding \texttt{y}. If we want the
+addition to be part of the argument to \texttt{f}, we have to use parentheses as follows: 
+\[
+\texttt{f (x + y)}.
+\]
+Alternatively, we can use the dollar-operator  and write
+\[
+\texttt{f \$ x + y}.
+\]
+This left-grouping is common for arithmetic operators and ensures consistency with standard arithmetic evaluation.
+
+The operator \texttt{\$} is particularly useful because of its very low precedence. It allows the programmer to write expressions without a multitude of parentheses. For example, consider:
+\[
+\texttt{print \$ sum \$ map (\textbackslash x -> x * 2) [1,2,3]}.
+\]
+Without \texttt{\$}, the same expression would require nested parentheses:
+\[
+\texttt{print (sum (map (\textbackslash x -> x * 2) [1,2,3]))}.
+\]
+By declaring \texttt{\$} as having a precedence of 0 and being right associative, Haskell ensures that all
+other operators bind more tightly, so the expression to the right of \texttt{\$} is completely grouped before
+being passed as an argument. 
+
+List operations provide a good demonstration of both precedence and associativity. The cons operator \texttt{:}
+is right-associative, so 
+\[
+\texttt{1 :\;2 :\;3 :\;[]}
+\]
+is interpreted as
+\[
+\texttt{1 :\;(2 :\;(3 :\;[]))}.
+\]
+This natural right grouping is essential for constructing lists.
+Relational operators, such as \texttt{==}, \texttt{<}, and \texttt{>=}, are declared as non-associative so that
+expressions like 
+\[
+\texttt{a < b < c}
+\]
+are not allowed without parentheses. This design choice prevents ambiguous chaining of comparisons; instead,
+the programmer must explicitly write 
+\[
+\texttt{(a < b) \&\& (b < c)}
+\]
+to test whether \texttt{b} lies between \texttt{a} and \texttt{c}.
+
+\noindent
+\colorbox{yellow}{\textbf{Attention:}}  There is a snag when dealing with negative numbers.  If \texttt{f} is a function that
+takes one argument of type \texttt{Integer} and we want to call it with a negative number, for example with
+\texttt{-42}, then we can not write the following:
+\\[0.2cm]
+\hspace*{1.3cm}
+\texttt{f -42}
+\\[0.2cm]
+The reason is that \textsl{Haskell} interprets this as an expression where \texttt{42} is subtracted from
+\texttt{f}.  The correct way to call \texttt{f} with an argument of \texttt{-42} is therefore to write the following:
+\\[0.2cm]
+\hspace*{1.3cm}
+\texttt{f (-42)}
+
+
+\section{Defining Functions in Haskell}
+In Haskell, functions are first-class citizens and form the backbone of the language. Unlike imperative
+languages where functions might be seen merely as procedures or routines, in Haskell every function is a \blue{pure}
+mapping from inputs to outputs.  In this context, the word \blue{pure} is a technical term that means that the
+function has no side effects, i.e.~it cannot change any variables or perform input or output, unless it is
+specifically declared to be an \texttt{IO} function.
+
+This section provides an in-depth exploration of function definitions in
+Haskell. First, we discuss the basic syntax of function definitions and their type signatures. After that we discuss
+\blue{matching}, \blue{guards}, \blue{higher-order functions}, \blue{currying}, \blue{lambda expressions},
+recursion, and \blue{polymorphism}. 
+
+
+\subsection{Introduction to Function Definitions}
+At its core, a function in Haskell is defined by a name, a set of parameters, and an expression that computes the result. The simplest form of a function definition is:
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+square :: Integer -> Integer
+square x = x * x
+\end{lstlisting}
+Here, \texttt{square} is a function that takes a number \texttt{x} of type \texttt{Integer} and returns
+\texttt{x * x}. 
+
+Every function has a type, and while the compiler is capable of inferring types, it is a good practice to include explicit type signatures. Consider:
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+add :: Integer -> Integer -> Integer
+add x y = x + y
+\end{lstlisting}
+The type signature of \texttt{add} tells us that it takes two integers and returns an integer. Type signatures
+serve as a form of documentation and help catch errors during compilation. 
+
+Haskell’s type inference system can often deduce the type without explicit signatures. For instance, writing:
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+multiply x y = x * y
+\end{lstlisting}
+allows the compiler to infer that \texttt{multiply} has a type compatible with \texttt{Num a => a -> a -> a}.
+Here, \texttt{Num} is a so called \blue{type class} and the type signature
+\\[0.2cm]
+\hspace*{1.3cm}
+\texttt{Num a => a -> a -> a}
+\\[0.2cm]
+tells us that if we have two arguments \texttt{x} and \texttt{y} of type \texttt{a} where the type \texttt{a}
+is an instance of the type class \texttt{Num}, then the expression \texttt{multiply x y} will again have the
+type \texttt{a}.  The notion of a \blue{type class} is an advanced concept that will be discussed later. 
+Although type inference is possible, explicit type signatures are recommended for readability.
+
+\subsection{Basic Function Syntax}
+A function definition in Haskell follows the general form:
+\\[0.2cm]
+\hspace*{1.3cm}
+$\texttt{functionName} \;\mathtt{arg}_1 \;\mathtt{arg}_2\; ... \;\mathtt{arg}_N = \mathtt{expression}$
+\\[0.2cm]
+Functions can have multiple parameters, and the absence of parentheses around the parameters emphasizes that
+Haskell functions are \blue{curried} by default.  The concept of currying will be discussed now.
+Consider the following example: 
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+add :: Int -> Int -> Int 
+add x y = x + y 
+\end{lstlisting}
+This definition can be interpreted as \texttt{add} taking an integer \texttt{x} and returning a new
+function that takes an integer \texttt{y}.   For clarity, we could have written the type signature of
+\texttt{add} as follows:
+\\[0.2cm]
+\hspace*{1.3cm}
+\texttt{add :: Int -> (Int -> Int)}
+\\[0.2cm]
+This notation emphasizes that \texttt{add} takes and integer and returns a function of type \texttt{Int -> Int}.
+The operator \texttt{->} is right associative and hence the types
+\\[0.2cm]
+\hspace*{1.3cm}
+\texttt{Int -> Int -> Int} \quad and \quad \texttt{Int -> (Int -> Int)}
+\\[0.2cm]
+are the same.
+
+
+\subsection{Pattern Matching in Function Definitions}
+Pattern matching is a fundamental mechanism in Haskell for deconstructing data. It allows functions to perform
+different computations based on the structure of their inputs. Consider the definition of the factorial
+function: 
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+factorial :: Integer -> Integer
+factorial 0 = 1
+factorial n = n * factorial (n - 1)
+\end{lstlisting}
+Here, the pattern \texttt{0} directly matches the base case. Pattern matching can be used with more complex data types such as lists and tuples.
+
+For example, here is a function that computes the length of a list:
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+listLength :: [a] -> Int
+listLength []     = 0
+listLength (_:xs) = 1 + listLength xs
+\end{lstlisting}
+In this example, the empty list \texttt{[]} is matched by the first clause, while the pattern
+\texttt{(}\textbf{\_}\texttt{:xs)}
+matches any non-empty list, ignoring the head element and recursively processing the tail.  In this pattern,
+the underscore \textbf{\_} denotes the so called \blue{anonymous} variable.  This is the same as in
+\textsl{Python}. 
+
+\subsection{Guards and Conditional Function Definitions}
+Guards offer an alternative way to define functions that behave differently based on Boolean conditions. Instead of writing multiple equations with pattern matching, guards allow for a more readable, condition-based approach. For example, a function to compute the absolute value:
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+absolute :: Integer -> Integer
+absolute x 
+  | x < 0     = -x
+  | otherwise = x
+\end{lstlisting}
+Each guard (beginning with \texttt{|}) is a Boolean expression. The first guard that evaluates to \texttt{True} determines which expression is returned. The \texttt{otherwise} guard is a catch-all that always evaluates to \texttt{True}.
+
+Guards can also be combined with pattern matching. Consider a function that classifies numbers:
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+classify :: Integer -> String
+classify 0 = "zero"
+classify n 
+  | n < 0     = "negative"
+  | n > 0     = "positive"
+\end{lstlisting}
+This function first checks if the number is zero. If not, it uses guards to determine whether the number is negative or positive.
+
+\subsection{The Use of \texttt{where} and \texttt{let} Clauses}
+Complex function definitions often benefit from local bindings to make the code clearer and more
+modular. Haskell provides two constructs for this purpose: \texttt{where} clauses and \texttt{let} expressions.
+\begin{enumerate}[(a)]
+\item A \texttt{where} clause allows the definition of auxiliary functions and variables at the end of a function
+  definition. For example, a function so solve the quadratic equation
+  \\[0.2cm]
+  \hspace*{1.3cm}
+  $a \cdot x^2 + b \cdot x + c = 0$
+  \\[0.2cm]
+  can be defined as follows:
+  \begin{lstlisting}[style=haskellstyle, language=Haskell]
+quadratic ::  Double -> Double -> Double -> (Double, Double)
+quadratic a b c = (x1, x2)
+where
+    discriminant = b * b - 4 * a * c
+    x1 = (-b + sqrt discriminant) / (2 * a)
+    x2 = (-b - sqrt discriminant) / (2 * a)
+\end{lstlisting}
+The \texttt{where} clause contains definitions that are local to the function \texttt{quadratic}, making the
+main expression easier to read. 
+\item A \texttt{let} expression provides a way to bind variables in an expression.
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+compute :: Int -> Int
+compute x = let y = x * 2
+                z = y + 3
+            in z * z
+\end{lstlisting}
+Here, \texttt{y} and \texttt{z} are only visible in the expression following the \texttt{in} keyword.
+\end{enumerate}
+  A \texttt{let} expression can be used on the right hand side of a guarded equation and is then
+  local to this equation, whereas the variable defined in a \texttt{where} clause are defined for all equations
+  defining a function.
+
+\subsection{Currying and Partial Application}
+A unique feature of Haskell is that functions are curried by default. This means that every function taking multiple arguments is actually a series of functions, each taking a single argument. Consider the addition function:
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+add :: Int -> Int -> Int
+add x y = x + y
+\end{lstlisting}
+This function can be partially applied:
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+increment :: Int -> Int
+increment = add 1
+\end{lstlisting}
+Here, \texttt{increment} is a new function that adds 1 to its argument. Currying promotes code reuse and leads to elegant function composition.
+
+\subsection{Lambda Expressions}
+Lambda expressions, or anonymous functions, allow for the definition of functions without explicitly naming them. They are useful for short-lived functions, particularly when passing a function as an argument to higher-order functions. For instance:
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+squares :: [Int] -> [Int]
+squares xs = map (\x -> x * x) xs
+\end{lstlisting}
+The lambda expression \texttt{(\textbackslash x -> x * x)} takes an argument \texttt{x} and returns its square. Lambda expressions are concise and facilitate inline function definitions.
+
+\subsection{Higher-Order Functions}
+
+Functions that take other functions as arguments or return them as results are called higher-order functions. They are central to functional programming. For example, the \texttt{map} function applies a function to every element in a list:
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+myMap :: (a -> b) -> [a] -> [b]
+myMap f []     = []
+myMap f (x:xs) = f x : myMap f xs
+\end{lstlisting}
+A custom higher-order function might filter elements in a list based on a predicate:
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+myFilter :: (a -> Bool) -> [a] -> [a]
+myFilter \_ [] = []
+myFilter p (x:xs)
+  | p x       = x : myFilter p xs
+  | otherwise = myFilter p xs
+\end{lstlisting}
+In this definition, \texttt{myFilter} takes a predicate \texttt{p} and a list, returning a list of elements for which \texttt{p} returns \texttt{True}.
+
+\noindent
+\colorbox{yellow}{\textbf{Note}} that \textsl{Haskell} comes with the functions \texttt{map} and
+\texttt{filter} that are defined exactly as we have defined the functions \texttt{myMap} and \texttt{myFilter}.
+We had to rename these function when defining them ourselves because in contrast to \textsl{Python},
+\textsl{Haskell} does not allow the redefinition of predefined functions.
+
+\subsection{Recursive Function Definitions}
+Since there are no control structures like \texttt{for} loops or \texttt{while} loops in \textsl{Haskell}, we
+have to use recursion far more often than in \textsl{Python}.
+In \textsl{Haskell}, many functions, particularly those that operate on recursive data structures such as
+lists, are defined recursively.  Consider the definition of the fibonacci function that computes the $n^{\textrm{th}}$
+\href{https://en.wikipedia.org/wiki/Fibonacci_sequence}{Fibonacci} number: 
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+fibonacci :: Integer -> Integer
+fibonacci 0 = 0
+fibonacci 1 = 1
+fibonacci n = fibonacci (n - 1) + fibonacci (n - 2)
+\end{lstlisting}
+While this implementation is straightforward, it may not be efficient for large \texttt{n}. More advanced
+techniques, such as \blue{memoization} or \blue{tail recursion}, can optimize recursive functions. 
+
+Tail recursion is a form of recursion where the recursive call is the last operation in the function. Tail-recursive functions can be optimized by the compiler to iterative loops, saving stack space. For example, a tail-recursive factorial function can be written as:
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+factorialTR :: Integer -> Integer
+factorialTR n = factHelper n 1
+  where
+    factHelper 0 acc = acc
+    factHelper k acc = factHelper (k - 1) (k * acc)
+\end{lstlisting}
+In this version, the accumulator \texttt{acc} carries the intermediate results, ensuring that the recursive call to \texttt{factHelper} is in tail position.
+
+\subsection{Polymorphism and Overloaded Functions}
+
+Haskell functions are often polymorphic, meaning that they can operate on values of various types. The function \texttt{id}, which returns its argument unchanged, is a classic example:
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+id :: a -> a
+id x = x
+\end{lstlisting}
+Here, \texttt{id} is defined for any type \texttt{a}. Polymorphism is facilitated by Haskell’s type system and its use of type classes, which allow functions to operate on a range of types that share common behavior.
+
+Another example is the \texttt{const} function:
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+const :: a -> b -> a
+const x _ = x
+\end{lstlisting}
+\texttt{const} takes two arguments and returns the first, ignoring the second. Its polymorphic type signature reflects the fact that it can be applied to arguments of any types.
+
+\subsection{Function Composition and Pipelines}
+Function composition is a powerful tool in Haskell, allowing complex functions to be built by composing simpler ones. The composition operator is defined as:
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+(.) :: (b -> c) -> (a -> b) -> a -> c
+f . g = \x -> f (g x)
+\end{lstlisting}
+You should take note of the syntax of the type declaration:  When declaring the type of an operator (in this
+case the operator is the symbol \texttt{.}) we have to enclose the operator in parentheses and write \texttt{(.)}.
+
+Using composition, a pipeline of functions can be created without resorting to nested function calls. For example:
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+process :: [Int] -> Int
+process = sum . map square . filter even
+\end{lstlisting}
+Here, the list is first filtered for even numbers, then each even number is squared, and finally the squares are summed. The composition operator makes the data flow clear and concise.
+
+\subsection{Point Free Style}
+In point-free programming, functions are defined without explicitly mentioning their arguments. Consider the function:
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+sumSquares :: [Int] -> Int
+sumSquares xs = (sum . (map (\x -> x * x))) xs
+\end{lstlisting}
+This can be rewritten in point-free style as:
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+sumSquares :: [Int] -> Int
+sumSquares = sum . map (\x -> x * x)
+\end{lstlisting}
+Point-free style can lead to more concise definitions, though it is important to balance conciseness with
+clarity.  My own experience is that it takes a while to get used to point-free style, but once you get the hang
+of it, you will use it often.
+
+\subsection{List Comprehensions in Haskell}
+List comprehensions provide a concise and expressive way to construct lists by specifying their elements in
+terms of existing lists. Inspired by mathematical set notation, list comprehensions allow you to generate new
+lists by transforming and filtering elements from one or more source lists. Their elegant syntax and expressive
+power make them a favorite tool for many Haskell programmers. 
+
+At its core, a list comprehension has the following general syntax:
+\[
+[ \text{expression} \; | \; \text{qualifier}_1, \text{qualifier}_2, \dots, \text{qualifier}_n ]
+\]
+In this construct, the \emph{expression} is evaluated for every combination of values generated by the
+qualifiers. Qualifiers can be either  \blue{generators} or \blue{filters}.  A generator has the form
+\\[0.2cm]
+\hspace*{1.3cm}
+\texttt{pattern <- list}
+\\[0.2cm]
+ and is used to extract elements from an existing list, while a filter is simply a
+Boolean expression that restricts which elements are included. 
+We begin with  a simple example where we generate a list of squares for the numbers from 1 to 10:
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+squares :: [Int]
+squares = [ x * x | x <- [1..10] ]
+\end{lstlisting}
+Here, \texttt{x <- [1..10]} is a generator that iterates over the numbers 1 through 10, and the expression
+\texttt{x * x} calculates the square of each number. 
+
+List comprehensions also allow you to filter elements by adding a Boolean condition. For instance, to generate
+a list of even squares from 1 to 10 we can write the following:
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+evenSquares :: [Int]
+evenSquares = [ x * x | x <- [1..10], even x ]
+\end{lstlisting}
+In this example, the qualifier \texttt{even x} acts as a filter, ensuring that only even values of \texttt{x}
+are considered. As a result, only the squares of even numbers are produced. 
+
+List comprehensions can also combine multiple generators to produce lists based on the Cartesian product of
+several lists. For example, the following comprehension generates pairs of numbers where the first element is
+taken from \texttt{[1,2,3]} and the second from \texttt{[4,5]}: 
+\begin{lstlisting}[style=haskellstyle, language=Haskell]
+pairs :: [(Int, Int)]
+pairs = [ (x, y) | x <- [1,2,3], y <- [4,5] ]
+\end{lstlisting}
+This comprehension evaluates the tuple \texttt{(x, y)} for each combination of \texttt{x} and \texttt{y}, resulting in a list of pairs.
+
+
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "haskell"
+%%% End:
