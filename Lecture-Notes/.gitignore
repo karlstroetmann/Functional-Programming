@@ -4,3 +4,8 @@ _minted-haskell
 _region_.log
 _region_.prv
 _region_.tex
+haskell.aux
+haskell.log
+haskell.toc
+haskell.synctex.gz
+_region_.synctex.gz

@@ -30,7 +30,7 @@ showPair (f, w) = w ++ ": " ++ show f ++ "\n"
 -- Extracts the `n` most common words from a text and formats them.
 comnWrds :: Int -> String -> String
 comnWrds n b = concatMap showPair $ divide nw . take n . reverse . sort . countRuns . sort $ aw
-  where
+      where
     aw = (myWords . map toLower) b
     nw = length aw
                  
