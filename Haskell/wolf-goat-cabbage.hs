@@ -1,5 +1,5 @@
 {-# LANGUAGE UnicodeSyntax #-}
-import Data.Set (Set, (\\), fromList, toList, findMin, insert, empty)
+import Data.Set (Set, (\\), fromList, toList, empty)
 import qualified Data.Set as Set
 
 import Bfs (search)
@@ -23,13 +23,10 @@ noProblem s = not (problem s) && not (problem $ allItems \\ s)
 states :: Set (Set String)
 states = Set.filter noProblem (power allItems)
 
-stateList :: [Set String]
-stateList = toList states
-
 -- Generate relations r1 and r2
 r1 :: [(Set String, Set String)]
 r1 = [ (s, diff)
-     | s <- stateList
+     | s <- toList states
      , b <- toList $ power s
      , let diff = s \\ b 
      , diff ∈ states
@@ -51,21 +48,13 @@ start = allItems
 goal :: Set String
 goal = empty
 
--- Define the path using the search function
--- Assuming `search` is implemented as provided earlier
-path :: Maybe [Set String]
-path = search r start goal
-
 -- Function to print each list in the path
 printPath :: [Set String] -> IO ()
 printPath path = mapM_ (putStrLn . show . toList) path
 
 main :: IO ()
 main = do
-    let path = search r start goal 
-    case path of
-        Nothing -> putStrLn "No path found."
-        Just p  -> printPath p
+    printPath $ head $ search r start goal 
 
 -- Solution:
 -- ["cabbage","farmer","goat","wolf"]

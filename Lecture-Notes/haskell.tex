@@ -17,6 +17,18 @@
 \usepackage{theorem}
 \usepackage{hyperref}
 \usepackage{tikz}
+
+\usepackage{newunicodechar}
+
+\newunicodechar{→}{\ensuremath{\rightarrow}}
+\newunicodechar{←}{\ensuremath{\leftarrow}}
+\newunicodechar{⇒}{\ensuremath{\Rightarrow}}
+
+\newunicodechar{∈}{\ensuremath{\in}}
+\newunicodechar{∉}{\ensuremath{\notin}}
+\newunicodechar{∪}{\ensuremath{\cup}}
+\newunicodechar{∩}{\ensuremath{\cap}}
+
 \usepackage[all]{hypcap}
 \hypersetup{
         colorlinks = true, % comment this to make xdvi work
@@ -34,7 +46,6 @@
 \definecolor{amber}{rgb}{1.0, 0.75, 0.0}
 \definecolor{gold}{rgb}{1.0, 0.843, 0.0}
 
-\renewcommand*{\familydefault}{\sfdefault}
 % Set up listings for Python
 \lstset{
     language=Python,
@@ -175,6 +186,7 @@
 
 \begin{document}
 \maketitle
+\tableofcontents
 
 \begin{abstract}
 \noindent
@@ -186,26 +198,35 @@ programming language that is both usefull and mind extending, then I consider my
 Therefore, this short paper will just present some of the highlights of the programming language
 \textsl{Haskell} via examples that I hope the reader finds intriguing enough so that she feels inclined to read
 some of the outstanding books introducing Haskell in more depth.  There are three books that I recommend for
-those readers who want to understand \textsl{Haskell} in more depth:
+those readers who want to understand \textsl{Haskell} in more depth:  
 \begin{enumerate}
+\item \emph{Programming in Haskell}
+
+      by Graham Hutton \cite{hutton:2016}.  This book has some nice \href{https://www.youtube.com/playlist?list=PLF1Z-APd9zK7usPMx3LGMZEHrECUGodd3}{YouTube videos}.
+\item \emph{Haskell: The Craft of Functional Programming}
+
+      by Simon Thompson \cite{thompson:2011}.
+      This book is available free online at
+      \\[0.2cm]
+      \hspace*{1.3cm}
+      \href{https://www.haskellcraft.com}{https://www.haskellcraft.com}.
+
+\item \emph{Learn You a Haskell for Great Good!}
+
+      by Miran Lipova\v{c}a \cite{lipovaca:2011}.
+      This book is available free online at
+      \\[0.2cm]
+      \hspace*{1.3cm}
+      \href{https://learnyouahaskell.com/}{https://learnyouahaskell.com}.
 \item \emph{Effective Haskell: Solving Real-World Problems with Strongly Typed Functional Programming} 
 
       by Rebecca Skinner \cite{skinner:2023}.
-\item \emph{Programming in Haskell}, second edition 
-
-      by Graham Hutton \cite{hutton:2016}.
-  
-\item \emph{Learn You a Haskell for Great Good!},
-
-      by Miran Lipova\v{c}a \cite{lipovaca:2011}.
-
-      This book is available free online at
-      \href{https://learnyouahaskell.com/}{https://learnyouahaskell.com/}.
 \end{enumerate}
 \end{abstract}
 
 \include{introduction}
 \include{types}
+\include{examples}
 
 \bibliographystyle{alpha}
 \bibliography{cs}

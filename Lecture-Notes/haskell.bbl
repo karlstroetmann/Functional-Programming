@@ -1,9 +1,19 @@
-\begin{thebibliography}{Mer15}
+\begin{thebibliography}{Tho11}
+
+\bibitem[Bir14]{bird:2014}
+Richard Bird.
+\newblock {\em Thinking Functionally with Haskell}.
+\newblock Cambridge University Press, 2014.
 
 \bibitem[Hut16]{hutton:2016}
 Graham Hutton.
 \newblock {\em Programming in Haskell}.
 \newblock Cambridge University Press, 2nd edition, 2016.
+
+\bibitem[Juo08]{juola:2008}
+Patrick Juola.
+\newblock {\em Authorship Attribution}.
+\newblock Now Publishers, 2008.
 
 \bibitem[Lip11]{lipovaca:2011}
 Miran Lipovača.
@@ -14,6 +24,11 @@ Miran Lipovača.
 Steven~F. Lott.
 \newblock {\em Functional Python Programming - Third Edition}.
 \newblock Packt Publishing, 3rd edition, 2022.
+
+\bibitem[Mel51]{melville:1851}
+Herman Melville.
+\newblock {\em Moby-Dick; or, The Whale}.
+\newblock Harper \& Brothers, New York, 1851.
 
 \bibitem[Mer15]{mertz:2015}
 David Mertz.
@@ -31,5 +46,10 @@ Rebecca Skinner.
 \newblock {\em Effective Haskell: Solving Real-World Problems with Strongly
   Typed Functional Programming}.
 \newblock Pragmatic Bookshelf, 2023.
+
+\bibitem[Tho11]{thompson:2011}
+Simon Thompson.
+\newblock {\em Haskell: The Craft of Functional Programming}.
+\newblock Addison-Wesley, 3rd edition, 2011.
 
 \end{thebibliography}

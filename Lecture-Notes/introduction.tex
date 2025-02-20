@@ -74,8 +74,10 @@ an idea about what to expect.  \textsl{Haskell} has the following properties:
   \\[0.2cm]
   has to be evaluated, first the subexpressions $a_1$, $\cdots$ $a_n$ are evaluated.  Let us assume that $a_i$
   is evaluated to to value $x_i$.  The, $f(x_1, \cdots, x_n)$ is computed.  This might be very inefficient.
-  Consider the following contrived example:
+  Consider the example shown in Figure \ref{fig:eager.c} on page \pageref{fig:eager.c}.
 
+\begin{figure}[!ht]
+  \centering
 \begin{minted}[ frame         = lines, 
                  framesep      = 0.3cm, 
                  firstnumber   = 1,
@@ -92,6 +94,11 @@ an idea about what to expect.  \textsl{Haskell} has the following properties:
       return 2 * y;
   }
 \end{minted}
+\vspace*{-0.3cm}
+\caption{A \texttt{C} program.}
+\label{fig:eager.c}
+\end{figure}
+
 Let us assume that the expression
 \\[0.2cm]
 \hspace*{1.3cm}

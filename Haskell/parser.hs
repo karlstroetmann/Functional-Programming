@@ -1,3 +1,36 @@
+-- This is a parser for arithmetic expression that is based on the parser discussed
+-- in the book "Programming in Haskell" by Graham Hutton.
+-- It is implements the following EBNF grammar.
+-- 
+-- expr     ::= term restExpr
+--           ;
+--
+-- restExpr ::= "+" term restExpr
+--           |  "-" term restExpr
+--           |  
+--           ; 
+-- 
+-- term     ::= factor restTerm
+--           ;
+-- 
+-- restTerm ::= "*" power restTerm
+--           |  "/" power restTerm
+--           |
+--           ;
+-- 
+-- power    ::= factor "^" power
+--           |  factor
+--           ;
+-- 
+-- factor   ::= "(" expr ")"
+--           |  natural
+--           ;
+--
+-- natural  ::= digit*
+--           ;
+--
+-- In this grammar, white space is silently discarded.
+
 import Control.Applicative
 import Data.Char
 
@@ -45,7 +78,8 @@ instance Alternative Parser where
                        []       -> parse q s
                        [(v, r)] -> [(v, r)])
     
--- compute a parser that reads a character if it satisfies the predicate p
+-- computes a parser that reads a character iff that character satisfies
+-- the predicate p
 sat :: (Char -> Bool) -> Parser Char
 sat p = do x <- item
            if p x then return x else empty
@@ -54,61 +88,43 @@ sat p = do x <- item
 digit :: Parser Char
 digit = sat isDigit
 
--- read a lower case character
-lower :: Parser Char
-lower = sat isLower
-
--- read an upper case character
-upper :: Parser Char
-upper = sat isUpper
-
--- read an alphabetic character
-letter :: Parser Char
-letter = sat isAlpha
-
--- read alphanumeric character
-alphnum :: Parser Char
-alphnum = sat isAlphaNum
-
--- read a specifixc character
+-- read a specific character
 char :: Char -> Parser Char
 char x = sat (== x)
 
--- read a given string
+-- read a specific string
 string :: String -> Parser String
 string []     = return []
 string (x:xs) = do char x
                    string xs
-                   return $ x:xs
-                   
-ident :: Parser String
-ident = do x  <- lower
-           xs <- many alphnum
-           return (x:xs)
+                   return (x:xs)
 
+-- read a natural number                   
 nat :: Parser Int
 nat = do xs <- some digit
          return $ read xs
 
+-- read whitespace characters and discard them
 space :: Parser ()
 space = do many $ sat isSpace
            return ()
-           
+
+-- read a token possibly surrounded by whitespace
 token :: Parser a -> Parser a
 token p = do space
              v <- p
              space
              return v
 
-identifier :: Parser String
-identifier = token ident
-
+-- parse a natural number possibly surrounded by whitespace
 natural :: Parser Int
 natural = token nat
 
+-- read a given string that is possibly surrounded by whitespace
 symbol :: String -> Parser String
 symbol xs = token $ string xs
 
+-- parse an arithemtic expression and evaluate it to an integer
 expr :: Parser Int
 expr = do t <- term
           restExpr t
@@ -148,4 +164,11 @@ factor = do symbol "("
             symbol ")"
             return e
             <|> natural
-            
+
+-- Ask for an arithemtic expression and parse and evaluate it.            
+main :: IO ()
+main = do putStr "Enter an arithmetic expression: "
+          s <- getLine
+          let [(n, _)] = parse expr s
+          putStr $ "The expression " ++ show s ++ " evaluates to " ++ show n ++ ".\n"
+          
