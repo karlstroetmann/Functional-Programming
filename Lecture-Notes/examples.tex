@@ -368,7 +368,7 @@ We proceed to discuss the program that is shown in Figure \ref{fig:common-words.
 \section{The Wolf, the Goat, and the Cabbage}
 Next,  we solve a problem that has puzzled the greatest agricultural economists for centuries.  The puzzle we
 want to solve is known as the  
-\href{http://jeux.lulu.pagesperso-orange.fr/html/anglais/loupChe/loupChe1.htm}{wolf-goat-cabbage puzzle}:  
+\href{https://en.wikipedia.org/wiki/Wolf,_goat_and_cabbage_problem}{wolf, goat, and cabbage problem}:  
 \vspace*{0.3cm}
 
 \begin{minipage}[c]{15cm}
@@ -384,6 +384,331 @@ without either the goat or the cabbage being eaten?
 \end{minipage}
 \vspace*{0.3cm}
 
+\noindent
+We will solve this problem by formulating it as a \blue{search problem}.  This search problem is then solved
+via \href{https://en.wikipedia.org/wiki/Breadth-first_search}{breadth first search}.
+
+\begin{Definition}[Search Problem]
+  A \blue{search problem} \index{search problem} is a tuple of the form
+  \\[0.2cm]
+  \hspace*{1.3cm}
+  $\mathcal{P} = \langle Q,\;R,\; \mathtt{start},\; \mathtt{goal}\rangle$
+  \\[0.2cm]
+  where
+  \begin{enumerate}[(a)]
+  \item $Q$ is the set of \blue{states}, also known as the \blue{state space}.
+        \index{state}
+  \item $R$ is a binary relation on $Q$, i.e.~we have $R \subseteq Q \times Q$.
+
+        If $\langle x, y \rangle \in Q$, then there is a direct connection between the states $x$ and $y$,
+        that is we can move in one step from the state $x$ to the state $y$.
+  \item \texttt{start} is the \blue{start state}, hence $\mathtt{start} \in Q$.
+  \item \texttt{goal} is the \blue{goal state}, hence $\mathtt{goal} \in Q$.    
+  \end{enumerate}
+  A \blue{path} \index{path} is a list $[s_1, \cdots, s_n]$ such that $\langle s_{i}, s_{i+1} \rangle \in R$
+  for all $i \in \{1,\cdots,n-1\}$.  The \blue{length} of this path is defined as the length of this list minus
+  1, i.e.~the path $[s_1, \cdots, s_n]$ has length $n-1$.  The reason for defining the length of this path as
+  $n-1$ and not $n$ is that the path consists of $n-1$ \blue{edges} \index{edge} of the form $\langle s_i, s_{i+1} \rangle$ where
+  $i \in \{1, \cdots, n-1\}$.
+  A path $[s_1, \cdots, s_n]$ is a \blue{solution} to the search problem $\mathcal{P}$ iff the following conditions are satisfied:
+  \begin{enumerate}
+  \item $s_1 = \mathtt{start}$, i.e.~the first element of the path is the start state.
+  \item $s_n = \mathtt{goal}$, i.e.~the last element of the path is the goal state. \eox
+  \end{enumerate}
+\end{Definition}
+
+\noindent
+We will model the wolf, goat, and cabbage problem as a search problem.
+To this end we define the set
+\\[0.2cm]
+\hspace*{1.3cm} 
+$\texttt{all} := \{ \squote{farmer},\; \squote{wolf},\; \squote{goat},\; \squote{cabbage} \}$.
+\\[0.2cm]
+Every state will be represented as a subset \texttt{s} of the set \texttt{all}.  The idea is that the set \texttt{s}
+specifies those objects that are on the left side of the river.  We assume that initially the farmer
+is on the left side of the river. 
+Therefore, the set of all possible states can be defined as the set
+\\[0.2cm]
+\hspace*{1.3cm}
+$Q := \bigl\{ s \mid s \in 2^{\mathtt{all}} \wedge \neg \mathtt{problem}(s) \wedge \neg \mathtt{problem}(\mathtt{all} \backslash s) \bigl\}$
+\\[0.2cm]
+Here, we have used the procedure \texttt{problem} to check whether a given state \texttt{s} has a problem. 
+Note that since \texttt{s} is the set of objects on the left side, the expression $\texttt{all} \backslash s$
+computes the set of objects on the right side of the river.
+
+Next, a state \texttt{s} of objects has a problem if both of the following conditions
+are satisfied:
+\begin{enumerate}
+\item The farmer is not an element of the set \texttt{s} and
+\item either \texttt{s} contains both the goat and the cabbage or \texttt{s} contains both the wolf and the goat.
+\end{enumerate}
+Therefore, we can implement the function \texttt{problem} in \textsl{Haskell} as follows:
+
+\begin{minted}[ frame         = lines, 
+                 framesep      = 0.3cm, 
+                 firstnumber   = 1,
+                 bgcolor       = white,
+                 numbers       = left,
+                 numbersep     = -0.2cm,
+                 xleftmargin   = 0.0cm,
+                 xrightmargin  = 0.0cm,
+               ]{haskell}
+    problem :: Set String -> Bool
+    problem s = "farmer" ∉ s &&
+                (("goat" ∈ s && "cabbage" ∈ s) ||  -- goat eats cabbage
+                 ("wolf" ∈ s && "goat"    ∈ s))    -- wolf eats goat
+\end{minted}
+We proceed to compute the relation $R$ that contains all possible transitions between
+different states.  We will compute $R$ using the formula:
+\\[0.2cm]
+\hspace*{1.3cm}
+$R := R_1 \cup R_2$
+\\[0.2cm]
+Here $R_1$ describes the transitions that result from the farmer crossing the river from left
+to right, while $R_2$ describes the transitions that result from the farmer crossing the river
+from right to left.  Mathematically, we can define the relation $R_1$ as follows:
+\\[0.2cm]
+\hspace*{1.3cm}
+$R_1 := \bigl\{ \langle s, s \backslash b \rangle \mid s \in Q \wedge b \in 2^s \wedge s \backslash b \in Q \wedge
+                \squote{farmer} \in b \wedge \mathtt{card}(b) \leq 2 \bigr\}$
+\\[0.2cm]
+Let us explain this definition in detail:
+\begin{enumerate}
+\item Initially, $s$ is the set of objects on the left side of the river.  Hence, $s$
+      is an element of the set of all states that we have defined as \texttt{P}.
+\item $b$ is the set of objects that are put into the boat and that do cross the river.  Of
+      course, for an object to go into the boat is has to be on the left side of the river to begin
+      with.  Therefore, $b$ is a subset of $s$ and hence an element of the power set
+      of $s$. 
+\item Then  $s \backslash b$ is the set of objects that are left on the left side of the river after
+      the boat has crossed.  Of course, the new state $s \backslash b$ has to be a state that does not
+      have a problem.  Therefore, we check that $s \backslash b$ is an element of the set of states $Q$.
+\item Furthermore, the farmer has to be in the boat.  This explains the condition 
+      \\[0.2cm]
+      \hspace*{1.3cm}
+      $\squote{farmer} \in b$.
+\item Finally, the boat can only have two passengers.  Therefore, we have added the condition
+      \\[0.2cm]
+      \hspace*{1.3cm}
+      \texttt{\texttt{card}(b) <= 2}.
+      \\[0.2cm]
+      Here, the function \texttt{card} computes the \emph{cardinality} of the set $b$, i.e.~it computes the
+      number of elements of $b$.
+\end{enumerate}
+Next, we have to define the relation $R_2$.  However, as crossing the river from right to left
+is just the reverse of crossing the river from left to right, $R_2$ is just the inverse of
+$R_1$.   Hence we define:
+\\[0.2cm]
+\hspace*{1.3cm}
+$R_2  := \bigl\{ \langle y, x \rangle \mid \langle x, y \rangle \in R_1 \bigr\}$
+\\[0.2cm]
+Finally, the start state has all objects on the left side.  Therefore, we have
+\\[0.2cm]
+\hspace*{1.3cm}
+$\texttt{start} := \texttt{all}$
+\\[0.2cm]
+In the end, all objects have to be on the right side of the river.  That means that nothing is left
+on the left side.  Therefore, we define
+\\[0.2cm]
+\hspace*{1.3cm}
+$\texttt{goal} := \{\}$
+\\[0.2cm]
+Figure \ref{fig:wolf-goat-cabbage.hs} on page \pageref{fig:wolf-goat-cabbage.hs} shows a \textsl{Haskell} program that 
+formulates the wolf, goat, and cabbage problem as a search problem.
+We discuss this program line by line:
+
+\begin{figure}[!ht]
+\centering
+\begin{minted}[ frame         = lines, 
+                 framesep      = 0.3cm, 
+                 firstnumber   = 1,
+                 bgcolor       = white,
+                 numbers       = left,
+                 numbersep     = -0.2cm,
+                 xleftmargin   = 0.0cm,
+                 xrightmargin  = 0.0cm,
+               ]{haskell}
+    {-# LANGUAGE UnicodeSyntax #-}
+    import Data.Set (Set, (\\), fromList, toList, filter, empty)
+    import Bfs (search)
+    import SetUtils (power, (∈), (∉))
+      
+    problem :: Set String -> Bool
+    problem s = "farmer" ∉ s &&
+                (("goat" ∈ s && "cabbage" ∈ s) ||  -- goat eats cabbage
+                 ("wolf" ∈ s && "goat"    ∈ s))    -- wolf eats goat
+    
+    allItems :: Set String
+    allItems = fromList ["farmer", "wolf", "goat", "cabbage"]
+    
+    noProblem :: Set String -> Bool
+    noProblem s = not (problem s) && not (problem $ allItems \\ s)
+    
+    states :: Set (Set String)
+    states = Data.Set.filter noProblem (power allItems)
+    
+    r1 :: [(Set String, Set String)]
+    r1 = [ (s, s \\ b) | s <- toList states,
+                         b <- toList $ power s, s \\ b ∈ states,
+                         "farmer" ∈ b, length b <= 2
+         ]
+    
+    r2 :: [(Set String, Set String)]
+    r2 = [ (s1, s2) | (s2, s1) <- r1 ]
+    
+    r :: [(Set String, Set String)]
+    r = r1 ++ r2
+    
+    start :: Set String
+    start = allItems
+    
+    goal :: Set String
+    goal = empty
+    
+    main :: IO ()
+    main = mapM_ (putStrLn . show) $ head $ search r start goal 
+\end{minted}
+\vspace*{-0.3cm}
+\caption{The wolf, the goat, and the cabbage.}
+\label{fig:wolf-goat-cabbage.hs}
+\end{figure}
+
+\begin{enumerate}
+\item In the first line we activate the Unicode syntax language extension.  This language extension enables us
+      to use Unicode characters as operator symbols.
+
+      Normally, everything encoded in the strings ``\texttt{\{-}'' and ``\texttt{-\}}'' is considered a comment.
+      However, there is one exception:  If a multiline comment starts as ``\texttt{\{-\# }'' and ends
+      with ``\texttt{\#-\}}, then the comment is considered a \blue{pragma}. A pragma can be used to activate a
+      \blue{language extension}. 
+\item In line 2 we import a number of items from the module \texttt{Data.Set}.
+      \begin{enumerate}
+      \item \texttt{Set} is the type of sets.
+      \item The operator \texttt{(\symbol{92}\symbol{92})} is used to build the difference of two sets, i.e.~if
+            $a$ and $b$ are sets, then
+            \\[0.2cm]
+            \hspace*{1.3cm}
+            $a \;\mathtt{\symbol{92}\symbol{92}}\; b := \{\, x \in a \mid x \not\in b \,\}$.
+      \item The function \texttt{fromList} has type signature
+            \\[0.2cm]
+            \hspace*{1.3cm}
+            \texttt{fromList ::\;Ord a => [a] -> Set a}.
+            \\[0.2cm]
+            The expression \texttt{fromList l} takes a list \texttt{l} of elements that can be compared
+            and returns a set containing the elements of \texttt{l}.
+      \item The function \texttt{toList} has type signature
+            \\[0.2cm]
+            \hspace*{1.3cm}
+            \texttt{toList ::\;Set a -> [a]}.
+            \\[0.2cm]
+            The expression \texttt{toList s} takes a set \texttt{s} of elements 
+            and returns a list containing the elements of \texttt{s}.
+      \item The function \texttt{filter} has type signature
+            \\[0.2cm]
+            \hspace*{1.3cm}
+            \texttt{Data.Set.filter ::\;(a -> Bool) -> Set a -> Set a}.
+            \\[0.2cm]
+            The expression \texttt{Data.Set.filter p s} takes a predicate \texttt{p} and a set \texttt{s}.
+            It returns a new set containing those elements \texttt{x} of \texttt{s} such that \texttt{p x} is
+            \texttt{True}:
+            \\[0.2cm]
+            \hspace*{1.3cm}
+            \texttt{Data.Set.filter p s = \{ x $\in$ s | p x \}}
+            \\[0.2cm]
+            Note that we have to qualify the function name \texttt{filter} as \texttt{Data.Set.filter} in order
+            to distinguish it from the function \texttt{filter} that works on lists.
+      \item The function \texttt{empty} has type signature
+            \\[0.2cm]
+            \hspace*{1.3cm}
+            \texttt{empty ::\;Set a}.
+            \\[0.2cm]
+            The expression \texttt{empty} returns an empty set.
+      \end{enumerate}
+      \item Line 3 imports the module \texttt{Bfs} which implements
+            \href{https://en.wikipedia.org/wiki/Breadth-first_search}{breadth-first search}.  We import the
+            function \texttt{search} from this module, which has the following type signature:
+            \\[0.2cm]
+            \hspace*{1.3cm}
+            \texttt{search ::\;Ord a => [(a, a)] -> a -> a -> [Bfs.Path a]}
+            \\[0.2cm]
+            The function \texttt{search} is called as follows:
+            \\[0.2cm]
+            \hspace*{1.3cm}
+            \texttt{search r s g}
+            \\[0.2cm]
+            Here \texttt{r} is a binary relation on some set of states \texttt{q}, i.e.~we have
+            $\texttt{r} \in \texttt{q} \times \texttt{q}$. The arguments \texttt{s} and \texttt{g} are elements
+            of \texttt{q} and the function returns a list of all shortest paths leading from the state
+            \texttt{s} (\underline{s}tart) to the state \texttt{g} (\underline{g}oal).
+      \item In line 4 we import the module \texttt{SetUtils}.  This module provides a number of functions and
+            operators that are useful when working with sets.
+            \begin{enumerate}
+            \item The function \texttt{power} has the type signature
+                  \\[0.2cm]
+                  \hspace*{1.3cm}
+                  \texttt{power :: Ord a => Set a -> Set (Set a)}
+                  \\[0.2cm]
+                  Given a set \texttt{s} the expression \texttt{power s} computes the set of all subsets of
+                  \texttt{s}, i.e.~we have
+                  \\[-0.2cm]
+                  \hspace*{1.3cm}
+                  \texttt{power s = \{ a \;|\; a $\subseteq$ s \}}.
+                  \\[0.2cm]
+                  For exampe, we have:
+                  \\[0.2cm]
+                  \hspace*{1.3cm}
+                  \texttt{power \{1, 2\} = \{\{\}, \{1\}, \{1,2\}, \{2\}\}}
+            \item The binary operator ``$\in$'' has the type signature
+                  \\[0.2cm]
+                  \hspace*{1.3cm}
+                  \texttt{(∈) :: Ord a => a -> Set a -> Bool}
+                  \\[0.2cm]
+                  The expression $x \in s$ yields \texttt{True} if and only if $x$ is an element from the set $s$.
+            \item The binary operator ``$\not\in$'' is the negation of the operator ``$\in$''.
+            \end{enumerate}
+      \item Line 6--9 define the function \texttt{problem}.  This function takes a state, i.e.~a set of the
+            items on a shore and returns \texttt{True} if there would be a problem on that shore.
+      \item Line 12 defines the set \texttt{allItems} as
+            \\[0.2cm]
+            \hspace*{1.3cm}
+            $\{ \squote{farmer},\; \squote{wolf},\; \squote{goat},\; \squote{cabbage} \}$.
+      \item The function \texttt{noProblem} takes a set \texttt{s} of items as its argument.  This set represents
+            the items on the left shore.  It checks that there is neither a problem on the left shore nor on
+            the right shore.
+
+            Note that if \texttt{s} is the set of items on the left shore, then
+            \texttt{allItems \symbol{92}\symbol{92} s} is the set of items on the right shore.
+      \item \texttt{states} is the set of all states of the search problem.   These are those subsets of the
+            set \texttt{allItems} such that there is no problem on either shore.
+      \item \texttt{r1} is the relation that describes all those transitions from the left shore to the right
+            shore that do not lead to a problematic state.  Rather than representing this relation as a set of
+            pairs it is represented as a list of pairs because this makes the definition a little bit more convenient.
+            \begin{enumerate}[(a)]
+            \item \texttt{s} is a state.
+            \item \texttt{b} is the set of items that cross the river on the boat.
+                  \begin{itemize}
+                  \item First of all, \texttt{b} has to be a subset of \texttt{s} because only item on the left
+                        shore cross the river from the left to the right.
+                  \item The new state is \texttt{s \symbol{92}\symbol{92} b} must not be problematic.
+                        Hence it has to be a memeber of \texttt{states}.
+                  \item The \squote{farmer} has to be on the boat and there may be at most two items on the boat.
+                  \end{itemize}
+            \item After the crossing of the river the new state is the set of those items that are left on the
+                  left shore \texttt{s \symbol{92}\symbol{92} b}.
+            \end{enumerate}
+      \item \texttt{r2} is the inverse of the relation \texttt{r1}.
+      \item \texttt{r} is the union of the relations \texttt{r1} and \texttt{r2}.
+      \item The \texttt{start} state is the state where all items are on the left shore.
+      \item The \texttt{goal} state is the state where all items are on the right shore.  Hence nothing is left
+            on the left shore.
+      \item The expression \texttt{search r start goal} computes the list of all minimal paths from \texttt{start} to
+            \texttt{goal} and the function \texttt{head} extracts the first such path.
+
+            This path is a list. The elements of this list are then converted to strings via \texttt{show} and
+            printed on separate lines via \texttt{putStrLn}.
+ \end{enumerate}
+
+
 \begin{figure}[!ht]
 \centering
 \begin{minted}[ frame         = lines, 
@@ -396,16 +721,17 @@ without either the goat or the cabbage being eaten?
                  xrightmargin  = 0.0cm,
                ]{python3}
     {-# LANGUAGE UnicodeSyntax #-}
-    {-# LANGUAGE ScopedTypeVariables #-}
     module Bfs (search) where
-   
-    import Data.Set (Set, fromList, singleton)
-    import qualified Data.Set as Set 
+    
+    import Data.Set (Set)
+    import qualified Data.Set as Set
     
     (∪) :: Ord a ⇒ Set a → Set a → Set a
-    (∪) = Set.union    
+    (∪) = Set.union
+    
     (∈) :: (Ord a) ⇒ a → Set a → Bool
-    (∈) = Set.member
+    (∈ ) = Set.member
+    
     (∉) :: (Ord a) ⇒ a → Set a → Bool
     x ∉ s = not (x ∈ s)
     
@@ -429,159 +755,7 @@ without either the goat or the cabbage being eaten?
 \caption{Breadth First Search.}
 \label{fig:bfs.hs}
 \end{figure}
-
-
-\begin{figure}[!ht]
-\centering
-\begin{minted}[ frame         = lines, 
-                 framesep      = 0.3cm, 
-                 firstnumber   = 1,
-                 bgcolor       = bg,
-                 numbers       = left,
-                 numbersep     = -0.2cm,
-                 xleftmargin   = 0.3cm,
-                 xrightmargin  = 0.3cm,
-               ]{haskell}
-    import Data.Set (Set, (\\), fromList, toList, empty)
-    import qualified Data.Set as Set
-    import Bfs (search)
-    import SetUtils (power, (∪), (∩), (∈), (∉))
-      
-    problem :: Set String -> Bool
-    problem s =
-        "farmer" ∉ s &&
-        (("goat" ∈ s && "cabbage" ∈ s) || ("wolf" ∈ s && "goat" ∈ s))       
-    
-    allItems :: Set String
-    allItems = fromList ["farmer", "wolf", "goat", "cabbage"]
-    
-    noProblem :: Set String -> Bool
-    noProblem s = not (problem s) && not (problem $ allItems \\ s)
-    
-    states :: Set (Set String)
-    states = Set.filter noProblem (power allItems)
-    
-    r1 :: [(Set String, Set String)]
-    r1 = [ (s, diff)
-         | s <- toList states
-         , b <- toList $ power s
-         , let diff = s \\ b 
-         , diff ∈ states
-         , "farmer" ∈ b
-         , length b <= 2
-         ]
-    
-    r2 :: [(Set String, Set String)]
-    r2 = map (\(s1, s2) -> (s2, s1)) r1
-    
-    r :: [(Set String, Set String)]
-    r = r1 ++ r2
-    
-    start = allItems
-    goal  = empty
-    
-    path :: Maybe [Set String]
-    path = search r start goal
-\end{minted}
-\vspace*{-0.3cm}
-\caption{The wolf, the goat, and the cabbage.}
-\label{fig:wolf-goat-cabbage.hs}
-\end{figure}
-
 \noindent
-In order to compute a schedule, we first have to model the problem.  The various \blue{states} of the problem will
-be regarded as \blue{nodes} of a directed graph and this graph will be represented as a binary relation.
-To this end we define the set
-\begin{verbatim}
-  All = {'farmer', 'wolf', 'goat', 'cabbage'}.
-\end{verbatim}
-Every node will be represented as a subset \texttt{s} of the set \texttt{All}.  The idea is that the set \texttt{s}
-specifies those objects that are on the left side of the river.  We assume that initially the farmer and his goods
-are on the left side of the river. 
-Therefore, the set of all states that are \blue{allowed} according to the specification of the problem can be defined
-as the set 
-\begin{verbatim}
-  States = { s \in 2^{\texttt{All}} | not problem(S) and not problem(All-S) }
-\end{verbatim}
-Here, we have used the procedure \texttt{problem} to check whether a given set \texttt{S} has a problem,
-where a problem is any situation where either the goat eats the cabbage or the wolf eats the goat.
-Note that since \texttt{S} is the set of objects on the left side, the expression $\texttt{All-S}$
-computes the set of objects on the right side of the river.
-
-Formally, a set \texttt{S} of objects has a problem if both of the following conditions
-are satisfied:
-\begin{enumerate}
-\item The farmer is not an element of \texttt{S} and
-\item either \texttt{S} contains both the goat and the cabbage or \texttt{S} contains both the wolf and the goat.
-\end{enumerate}
-Therefore, we can implement the function \texttt{problem} as follows:
-\begin{verbatim}
-  def problem(S):
-      return ('farmer' not in S) and             \
-             (('goat' in S and 'cabbage' in S) or   # goat eats cabbage
-              ('wolf' in S and 'goat'    in S)   )  # wolf eats goat
-\end{verbatim}
-Note that we have to use a \blue{line continuation backslash} ``\texttt{$\backslash$}''
-at the end of the first line of the return statement.
-We do not need a continuation backslash at the end of the second line of the return statement since
-the opening parenthesis at the beginning of the second line has not yet been closed when the second line
-finishes and therefore \textsl{Python} is able to figure out that the expression defined in this line is
-continued in the third line.
-
-We proceed to compute the relation \texttt{R} that contains all possible transitions between
-different states.  We will compute \texttt{R} using the formula:
-\\[0.2cm]
-\hspace*{0.75cm}
-\texttt{R = R1 + R2;}
-\\[0.2cm]
-Here \texttt{R1} describes the transitions that result from the farmer crossing the river from left
-to right, while \texttt{R2} describes the transitions that result from the farmer crossing the river
-from right to left.  We can define the relation \texttt{R1} as follows:
-\begin{verbatim}
-  R1 = { (S, S-B) for S in States 
-                  for B in power(S)
-                  if S-B in States and 'farmer' in B and len(B) <= 2
-       }
-\end{verbatim}
-Let us explain this definition in detail:
-\begin{enumerate}
-\item Initially, \texttt{S} is the set of objects on the left side of the river.  Hence, \texttt{S}
-      is an element of the set of all states that we have defined as \texttt{States}.
-\item \texttt{B} is the set of objects that are put into the boat and that do cross the river.  Of
-      course, for an object to go into the boat is has to be on the left side of the river to begin
-      with.  Therefore, \texttt{B} is a subset of \texttt{S} and hence \texttt{B} is an element of the power set
-      of \texttt{S}. 
-\item Therefore  \texttt{S-B} is the set of objects that are left on the left side of the river after
-      the boat has crossed.  Of course, the new state \texttt{S-B} has to be a state that does not
-      have a problem.  Therefore, we check that the set \texttt{S-B} is an element of the set \texttt{States}.
-\item Furthermore, the farmer has to be inside the boat.  This explains the condition 
-      \\[0.2cm]
-      \hspace*{1.3cm}
-      \texttt{\symbol{39}farmer\symbol{39} in B}.
-\item Finally, the boat can only have two passengers.  Therefore, we have added the condition
-      \\[0.2cm]
-      \hspace*{1.3cm}
-      \texttt{len(B) <= 2}.
-\end{enumerate}
-Next, we have to define the relation \texttt{R2}.  However, as crossing the river from right to left
-is just the reverse of crossing the river from left to right, \texttt{R2} is just the \blue{inverse} of
-\texttt{R1}.   Hence we define:
-\begin{verbatim}
-  R2 = { (S2, S1) for (S1, S2) in R1 }.
-\end{verbatim}
-Next, the relation \texttt{R} is the union of \texttt{R1} and \texttt{R2}:
-\begin{verbatim}
-  R = R1 | R2.
-\end{verbatim}
-Finally, the start state has all objects on the left side.  Therefore, we have
-\begin{verbatim}
-  start = All.
-\end{verbatim}
-In the end, all objects have to be on the right side of the river.  That means that nothing is left
-on the left side.  Therefore, we define
-\begin{verbatim}
-  goal = {}.
-\end{verbatim}
 
 
 \begin{figure}[h]
@@ -597,40 +771,9 @@ on the left side.  Therefore, we define
 
 \noindent
 Figure \ref{fig:wolf-goat-cabbage.pdf} on page \pageref{fig:wolf-goat-cabbage.pdf} displays the relation $R$ graphically.
-Figure \ref{fig:wolf-ziege} on page \pageref{fig:wolf-ziege} shows the program
-\href{https://github.com/karlstroetmann/Logic/blob/master/Python/wolf-goat-cabbage.py}{\texttt{wolf-goat-cabbage.py}}
-that combines the statements shown so far.  The solution computed by this program is shown in Figure
- \ref{fig:wolf-ziege-solution}.
 
-\begin{figure}[!ht]
-  \centering
-\begin{minted}[ frame         = lines, 
-                framesep      = 0.3cm, 
-                numbers       = left,
-                numbersep     = -0.2cm,
-                bgcolor       = bg,
-                xleftmargin   = 0.3cm,
-                xrightmargin  = 0.3cm,
-              ]{python3}
-    def problem(S):
-        return ('farmer' not in S) and             \
-               (('goat' in S and 'cabbage' in S) or   # goat eats cabbage
-                ('wolf' in S and 'goat'    in S)   )  # wolf eats goat
-    
-    All   = frozenset({ 'farmer', 'wolf', 'goat', 'cabbage' })
-    R1    = { (S, S - B) for S in States for B in power(S)
-                         if S - B in States and 'farmer' in B and len(B) <= 2
-            }
-    R2    = { (S2, S1) for (S1, S2) in R1 }
-    R     = R1 | R2
-    start = All
-    goal  = frozenset()
-    Path  = findPath(start, goal, R)
-\end{minted} 
-\vspace*{-0.3cm}
-\caption{Solving the wolf-goat-cabbage problem.}  
-\label{fig:wolf-ziege}
-\end{figure}
+
+
 
 
 \begin{figure}[!ht]

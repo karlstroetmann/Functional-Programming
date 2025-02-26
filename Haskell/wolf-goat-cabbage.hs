@@ -1,16 +1,13 @@
 {-# LANGUAGE UnicodeSyntax #-}
-import Data.Set (Set, (\\), fromList, toList, empty)
-import qualified Data.Set as Set
-
+import Data.Set (Set, (\\), fromList, toList, filter, empty)
 import Bfs (search)
-import SetUtils (power, (∪), (∩), (∈), (∉))
+import SetUtils (power, (∈), (∉))
   
 -- Define the problem
 problem :: Set String -> Bool
-problem s =
-    "farmer" ∉ s &&
-    (("goat" ∈ s && "cabbage" ∈ s) ||  -- Goat eats cabbage
-     ("wolf" ∈ s && "goat" ∈ s))       -- Wolf eats goat
+problem s = "farmer" ∉ s &&
+            (("goat" ∈ s && "cabbage" ∈ s) ||  -- goat eats cabbage
+             ("wolf" ∈ s && "goat"    ∈ s))    -- wolf eats goat
 
 -- Define the universe of all items
 allItems :: Set String
@@ -21,23 +18,19 @@ noProblem s = not (problem s) && not (problem $ allItems \\ s)
 
 -- Define all valid states (in this case, subsets of `allItems`)
 states :: Set (Set String)
-states = Set.filter noProblem (power allItems)
+states = Data.Set.filter noProblem (power allItems)
 
 -- Generate relations r1 and r2
 r1 :: [(Set String, Set String)]
-r1 = [ (s, diff)
-     | s <- toList states
-     , b <- toList $ power s
-     , let diff = s \\ b 
-     , diff ∈ states
-     , "farmer" ∈ b
-     , length b <= 2
+r1 = [ (s, s \\ b) | s <- toList states,
+                     b <- toList $ power s, s \\ b ∈ states,
+                     "farmer" ∈ b, length b <= 2
      ]
 
 r2 :: [(Set String, Set String)]
-r2 = map (\(s1, s2) -> (s2, s1)) r1
+r2 = [ (s1, s2) | (s2, s1) <- r1 ]
 
--- Combine relations
+-- Combine the relations
 r :: [(Set String, Set String)]
 r = r1 ++ r2
 
@@ -48,13 +41,8 @@ start = allItems
 goal :: Set String
 goal = empty
 
--- Function to print each list in the path
-printPath :: [Set String] -> IO ()
-printPath path = mapM_ (putStrLn . show . toList) path
-
 main :: IO ()
-main = do
-    printPath $ head $ search r start goal 
+main = mapM_ (putStrLn . show) $ head $ search r start goal 
 
 -- Solution:
 -- ["cabbage","farmer","goat","wolf"]
@@ -65,4 +53,5 @@ main = do
 -- ["goat"]
 -- ["farmer","goat"]
 -- []
+
 

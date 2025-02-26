@@ -1,5 +1,4 @@
 {-# LANGUAGE UnicodeSyntax #-}
-{-# LANGUAGE ScopedTypeVariables #-}
 module Bfs (search) where
 
 import Data.Set (Set)
