@@ -366,19 +366,19 @@ We proceed to discuss the program that is shown in Figure \ref{fig:common-words.
 
  
 \section{The Wolf, the Goat, and the Cabbage}
-Next,  we solve a problem that has puzzled the greatest agricultural economists for centuries.  The puzzle we
+Next,  we show how to solve logical puzzles with \textsl{Haskell}.  The puzzle we
 want to solve is known as the  
 \href{https://en.wikipedia.org/wiki/Wolf,_goat_and_cabbage_problem}{wolf, goat, and cabbage problem}:  
 \vspace*{0.3cm}
 
 \begin{minipage}[c]{15cm}
 {\sl
-An agricultural economist has to sell a wolf, a goat, and a cabbage on a market place.  In order to
+An farmer has to sell a wolf, a goat, and a cabbage on a market place.  In order to
 reach the market place, she has to cross a river.  The boat that she can use is so small that it can
-only accommodate either the goat, the wolf, or the cabbage in addition to the agricultural economist.
-Now if the agricultural economist leaves the wolf alone with the goat, the wolf will eat the goat.
-If, instead, the agricultural economist leaves the goat with the cabbage, the goat will eat the cabbage.
-Is it possible for the agricultural economist to develop a schedule that allows her to cross the river
+only accommodate either the goat, the wolf, or the cabbage in addition to the farmer.
+Now if the farmer leaves the wolf alone with the goat, the wolf will eat the goat.
+If, instead, the farmer leaves the goat with the cabbage, the goat will eat the cabbage.
+Is it possible for the farmer to develop a schedule that allows her to cross the river
 without either the goat or the cabbage being eaten?
 }
 \end{minipage}
@@ -389,7 +389,7 @@ We will solve this problem by formulating it as a \blue{search problem}.  This s
 via \href{https://en.wikipedia.org/wiki/Breadth-first_search}{breadth first search}.
 
 \begin{Definition}[Search Problem]
-  A \blue{search problem} \index{search problem} is a tuple of the form
+  A \blue{search problem} \index{search problem} is a 4-tuple of the form
   \\[0.2cm]
   \hspace*{1.3cm}
   $\mathcal{P} = \langle Q,\;R,\; \mathtt{start},\; \mathtt{goal}\rangle$
@@ -432,12 +432,13 @@ Therefore, the set of all possible states can be defined as the set
 \hspace*{1.3cm}
 $Q := \bigl\{ s \mid s \in 2^{\mathtt{all}} \wedge \neg \mathtt{problem}(s) \wedge \neg \mathtt{problem}(\mathtt{all} \backslash s) \bigl\}$
 \\[0.2cm]
-Here, we have used the procedure \texttt{problem} to check whether a given state \texttt{s} has a problem. 
+Here, we have used the procedure \texttt{problem} to check whether a given state \texttt{s} has a
+\blue{problem}, meaning that either the wolf can eat the goat or the goat can eat the cabbage. 
 Note that since \texttt{s} is the set of objects on the left side, the expression $\texttt{all} \backslash s$
 computes the set of objects on the right side of the river.
 
-Next, a state \texttt{s} of objects has a problem if both of the following conditions
-are satisfied:
+We implement a function \texttt{problem} that takes a set \texttt{s} of items as input and checks whether there
+is a problem.  A state \texttt{s} of objects has a problem if both of the following conditions are satisfied:
 \begin{enumerate}
 \item The farmer is not an element of the set \texttt{s} and
 \item either \texttt{s} contains both the goat and the cabbage or \texttt{s} contains both the wolf and the goat.
@@ -475,13 +476,13 @@ $R_1 := \bigl\{ \langle s, s \backslash b \rangle \mid s \in Q \wedge b \in 2^s 
 Let us explain this definition in detail:
 \begin{enumerate}
 \item Initially, $s$ is the set of objects on the left side of the river.  Hence, $s$
-      is an element of the set of all states that we have defined as \texttt{P}.
+      is an element of the set of all states that we have defined as $Q$.
 \item $b$ is the set of objects that are put into the boat and that do cross the river.  Of
       course, for an object to go into the boat is has to be on the left side of the river to begin
       with.  Therefore, $b$ is a subset of $s$ and hence an element of the power set
       of $s$. 
 \item Then  $s \backslash b$ is the set of objects that are left on the left side of the river after
-      the boat has crossed.  Of course, the new state $s \backslash b$ has to be a state that does not
+      the boat has crossedthe river.  Of course, the new state $s \backslash b$ has to be a state that does not
       have a problem.  Therefore, we check that $s \backslash b$ is an element of the set of states $Q$.
 \item Furthermore, the farmer has to be in the boat.  This explains the condition 
       \\[0.2cm]
@@ -529,11 +530,11 @@ We discuss this program line by line:
                  xrightmargin  = 0.0cm,
                ]{haskell}
     {-# LANGUAGE UnicodeSyntax #-}
-    import Data.Set (Set, (\\), fromList, toList, filter, empty)
+    import Data.Set (Set, (\\), fromList, toList, filter)
     import Bfs (search)
     import SetUtils (power, (∈), (∉))
       
-    problem :: Set String -> Bool
+    problem :: Set String → Bool
     problem s = "farmer" ∉ s &&
                 (("goat" ∈ s && "cabbage" ∈ s) ||  -- goat eats cabbage
                  ("wolf" ∈ s && "goat"    ∈ s))    -- wolf eats goat
@@ -541,20 +542,20 @@ We discuss this program line by line:
     allItems :: Set String
     allItems = fromList ["farmer", "wolf", "goat", "cabbage"]
     
-    noProblem :: Set String -> Bool
+    noProblem :: Set String → Bool
     noProblem s = not (problem s) && not (problem $ allItems \\ s)
     
     states :: Set (Set String)
     states = Data.Set.filter noProblem (power allItems)
     
     r1 :: [(Set String, Set String)]
-    r1 = [ (s, s \\ b) | s <- toList states,
-                         b <- toList $ power s, s \\ b ∈ states,
+    r1 = [ (s, s \\ b) | s ← toList states,
+                         b ← toList $ power s, s \\ b ∈ states,
                          "farmer" ∈ b, length b <= 2
          ]
     
     r2 :: [(Set String, Set String)]
-    r2 = [ (s1, s2) | (s2, s1) <- r1 ]
+    r2 = [ (s1, s2) | (s2, s1) ← r1 ]
     
     r :: [(Set String, Set String)]
     r = r1 ++ r2
@@ -563,7 +564,7 @@ We discuss this program line by line:
     start = allItems
     
     goal :: Set String
-    goal = empty
+    goal = fromList []
     
     main :: IO ()
     main = mapM_ (putStrLn . show) $ head $ search r start goal 
@@ -574,10 +575,10 @@ We discuss this program line by line:
 \end{figure}
 
 \begin{enumerate}
-\item In the first line we activate the Unicode syntax language extension.  This language extension enables us
+\item In the first line we activate the \blue{Unicode syntax language extension}.  This language extension enables us
       to use Unicode characters as operator symbols.
 
-      Normally, everything encoded in the strings ``\texttt{\{-}'' and ``\texttt{-\}}'' is considered a comment.
+      Normally, every text that is enclosed in the strings ``\texttt{\{-}'' and ``\texttt{-\}}'' is considered a comment.
       However, there is one exception:  If a multiline comment starts as ``\texttt{\{-\# }'' and ends
       with ``\texttt{\#-\}}, then the comment is considered a \blue{pragma}. A pragma can be used to activate a
       \blue{language extension}. 
@@ -595,7 +596,10 @@ We discuss this program line by line:
             \texttt{fromList ::\;Ord a => [a] -> Set a}.
             \\[0.2cm]
             The expression \texttt{fromList l} takes a list \texttt{l} of elements that can be compared
-            and returns a set containing the elements of \texttt{l}.
+            and returns a set containing the elements of \texttt{l}.  We have to require that the type $a$
+            belongs to the type class \texttt{Ord} because in Haskell sets are implemented as
+            \href{https://en.wikipedia.org/wiki/Binary_search_tree}{ordered binary search trees} and hence the
+            elements of a set need to be comparable. 
       \item The function \texttt{toList} has type signature
             \\[0.2cm]
             \hspace*{1.3cm}
@@ -603,7 +607,7 @@ We discuss this program line by line:
             \\[0.2cm]
             The expression \texttt{toList s} takes a set \texttt{s} of elements 
             and returns a list containing the elements of \texttt{s}.
-      \item The function \texttt{filter} has type signature
+      \item The function \texttt{Data.Set.filter} has type signature
             \\[0.2cm]
             \hspace*{1.3cm}
             \texttt{Data.Set.filter ::\;(a -> Bool) -> Set a -> Set a}.
@@ -616,13 +620,10 @@ We discuss this program line by line:
             \texttt{Data.Set.filter p s = \{ x $\in$ s | p x \}}
             \\[0.2cm]
             Note that we have to qualify the function name \texttt{filter} as \texttt{Data.Set.filter} in order
-            to distinguish it from the function \texttt{filter} that works on lists.
-      \item The function \texttt{empty} has type signature
+            to distinguish it from the predefined function \texttt{filter} that has the type signature
             \\[0.2cm]
             \hspace*{1.3cm}
-            \texttt{empty ::\;Set a}.
-            \\[0.2cm]
-            The expression \texttt{empty} returns an empty set.
+            \texttt{Data.Set.filter ::\;(a -> Bool) -> [a] -> [a]}.
       \end{enumerate}
       \item Line 3 imports the module \texttt{Bfs} which implements
             \href{https://en.wikipedia.org/wiki/Breadth-first_search}{breadth-first search}.  We import the
@@ -640,6 +641,9 @@ We discuss this program line by line:
             $\texttt{r} \in \texttt{q} \times \texttt{q}$. The arguments \texttt{s} and \texttt{g} are elements
             of \texttt{q} and the function returns a list of all shortest paths leading from the state
             \texttt{s} (\underline{s}tart) to the state \texttt{g} (\underline{g}oal).
+
+            The module \texttt{Bfs} is shown in Figure \ref{fig:Bfs.hs} on page
+            \pageref{fig:Bfs.hs}. 
       \item In line 4 we import the module \texttt{SetUtils}.  This module provides a number of functions and
             operators that are useful when working with sets.
             \begin{enumerate}
@@ -666,6 +670,7 @@ We discuss this program line by line:
                   The expression $x \in s$ yields \texttt{True} if and only if $x$ is an element from the set $s$.
             \item The binary operator ``$\not\in$'' is the negation of the operator ``$\in$''.
             \end{enumerate}
+            The module \texttt{SetUtils} is shown in Figure \ref{fig:SetUtils.hs} on page \pageref{fig:SetUtils.hs}.
       \item Line 6--9 define the function \texttt{problem}.  This function takes a state, i.e.~a set of the
             items on a shore and returns \texttt{True} if there would be a problem on that shore.
       \item Line 12 defines the set \texttt{allItems} as
@@ -706,6 +711,8 @@ We discuss this program line by line:
 
             This path is a list. The elements of this list are then converted to strings via \texttt{show} and
             printed on separate lines via \texttt{putStrLn}.
+      \item The function \texttt{mapM\_} is a variant of the function \texttt{map} that works with functions
+            performing \texttt{IO}.
  \end{enumerate}
 
 
@@ -753,9 +760,59 @@ We discuss this program line by line:
 \end{minted}
 \vspace*{-0.3cm}
 \caption{Breadth First Search.}
-\label{fig:bfs.hs}
+\label{fig:Bfs.hs}
 \end{figure}
 \noindent
+
+\begin{figure}[!ht]
+\centering
+\begin{minted}[ frame         = lines, 
+                framesep      = 0.3cm, 
+                firstnumber   = 1,
+                bgcolor       = white,
+                numbers       = left,
+                numbersep     = -0.2cm,
+                xleftmargin   = 0.0cm,
+                xrightmargin  = 0.0cm,
+              ]{haskell}
+    {-# LANGUAGE UnicodeSyntax #-}
+    module SetUtils (power, (∪), (∩), (∈), (∉), (∅)) where
+    
+    import Data.Set (Set, (\\), fromList, toList, findMin, insert)
+    import qualified Data.Set as Set
+    
+    -- the empty set
+    (∅) :: Ord a ⇒ Set a
+    (∅) = fromList []
+    
+    -- union of sets
+    (∪) :: Ord a ⇒ Set a → Set a → Set a
+    (∪) = Set.union
+    
+    -- intersection of sets
+    (∩) :: Ord a ⇒ Set a → Set a → Set a
+    (∩) = Set.intersection
+    
+    -- is x an element of s
+    (∈) :: (Ord a) ⇒ a → Set a → Bool
+    x ∈ s = x `Set.member` s
+    
+    -- is x not an element of s
+    (∉) :: (Ord a) ⇒ a → Set a → Bool
+    x ∉ s = not (x ∈ s)
+    
+    -- compute the power set of the set s
+    power :: Ord a ⇒ Set a → Set (Set a)
+    power s
+      | Set.null s = fromList [ (∅) ]
+      | otherwise  = p ∪ Set.map (\x → insert m x) p 
+        where m = findMin s
+              p = power (s \\ fromList [m])
+\end{minted}
+\vspace*{-0.3cm}
+\caption{The set utilities.}
+\label{fig:SetUtils.hs}
+\end{figure}
 
 
 \begin{figure}[h]
@@ -772,6 +829,7 @@ We discuss this program line by line:
 \noindent
 Figure \ref{fig:wolf-goat-cabbage.pdf} on page \pageref{fig:wolf-goat-cabbage.pdf} displays the relation $R$ graphically.
 
+Figure \ref{fig:wolf-ziege-solution} shows a shedule for solving the puzzle.
 
 
 
@@ -803,11 +861,116 @@ Figure \ref{fig:wolf-goat-cabbage.pdf} on page \pageref{fig:wolf-goat-cabbage.pd
     {}                                 {'cabbage', 'farmer', 'goat', 'wolf'}
 \end{minted} 
 \vspace*{-0.3cm}
-\caption{A schedule for the agricultural economist.}  
+\caption{A schedule for the farmer.}  
 \label{fig:wolf-ziege-solution}
 \end{figure}
 
-\vspace*{\fill}
+\FloatBarrier
+
+\section{Symbolic Differentiation}
+Figure \ref{fig:differentiate.hs} onm page \pageref{fig:differentiate.hs}
+shows a package that implements a crude form of symbolic differentiation.  For example, when given the
+expression $x^x$ this program is able to show that 
+\\[0.2cm]
+\hspace*{1.3cm}
+$\frac{\,\mathrm{d}\;\;\,}{\,\mathrm{d}\,x} x^x = x^x \cdot \bigl( \ln(x) + 1 \bigr)$.
+\\[0.2cm]
+We discuss this program line by line.
+
+\begin{figure}[!ht]
+\centering
+\begin{minted}[ frame         = lines, 
+                 framesep      = 0.3cm, 
+                 firstnumber   = 1,
+                 bgcolor       = white,
+                 numbers       = left,
+                 numbersep     = -0.2cm,
+                 xleftmargin   = 0.0cm,
+                 xrightmargin  = 0.0cm,
+               ]{haskell}
+    {-# LANGUAGE UnicodeSyntax #-}
+    data Expr = Add Expr Expr
+              | Sub Expr Expr
+              | Mul Expr Expr
+              | Div Expr Expr
+              | Pow Expr Expr
+              | Exp Expr
+              | Ln  Expr
+              | Var Char
+              | Num Double
+    
+    instance Show Expr where
+      show :: Expr → String          
+      show (Add x y) = "(" ++ (show x) ++ "+" ++ (show y) ++ ")"
+      show (Sub x y) = "(" ++ (show x) ++ "-" ++ (show y) ++ ")"
+      show (Mul x y) = "(" ++ (show x) ++ "*" ++ (show y) ++ ")"
+      show (Div x y) = "(" ++ (show x) ++ "/" ++ (show y) ++ ")"
+      show (Pow x y) = "(" ++ (show x) ++ "^" ++ (show y) ++ ")"
+      show (Exp x)   = "exp(" ++ show(x) ++ ")"
+      show (Ln  x)   = "ln("  ++ show(x) ++ ")"
+      show (Var c)   = [c]
+      show (Num x)   = show x
+    
+    diff :: Expr → Char → Expr
+    diff (Add f g) x = Add fs gs
+      where fs = diff f x; gs = diff g x
+    diff (Sub f g) x = Sub fs gs
+      where fs = diff f x; gs = diff g x
+    diff (Mul f g) x = Add (Mul fs g) (Mul f gs)
+      where fs = diff f x; gs = diff g x
+    diff (Div f g) x = Div (Sub (Mul fs g) (Mul f gs)) (Mul g g)
+      where fs = diff f x; gs = diff g x
+    diff (Pow f g) x = diff (Exp (Mul g (Ln f))) x 
+    diff (Exp f) x = Mul (Exp f) fs
+      where fs = diff f x
+    diff (Ln f) x = (Div fs f)
+      where fs = diff f x
+    diff (Var v) x   = if v == x then Num 1 else Num 0
+    diff (Num _) _   = Num 0
+\end{minted}
+\vspace*{-0.3cm}
+\caption{Symbolic differentiation.}
+\label{fig:differentiate.hs}
+\end{figure}
+
+
+
+
+
+
+
+
+\begin{enumerate}
+\item We define \texttt{Expr} as a recursive \blue{algebraic data type}.  This data type is meant to represent
+  arithmetic expressions.
+  \begin{enumerate}
+  \item Given two arithmetic expressions $e_1$ and $e_2$, an expression of the form \texttt{Add $e_1$ $e_2$} is
+        interpreted as the sum $e_1 + e_2$. 
+  \item Similarly, \texttt{Sub $e_1$ $e_2$} is interpreted as $e_1 - e_2$. 
+  \item \texttt{Mul $e_1$ $e_2$} is interpreted as $e_1 \cdot e_2$. 
+  \item \texttt{Div $e_1$ $e_2$} is interpreted as $e_1 / e_2$. 
+  \item \texttt{Pow $e_1$ $e_2$} is interpreted as $e_1^{e_2}$. 
+  \item Given an arithmetic expression $e$, \texttt{Exp $e$} is interpreted as $\exp(x)$, where
+        $\exp$ is the exponential function.
+  \item Similarly, \texttt{Ln $e$} is interpreted as $\ln(x)$, where
+        $\ln$ is the natural logarithm.
+  \item Given a character $c$, \texttt{Var $c$}  is interpreted as the variable with name $c$.
+  \item Given a real number $r$, \texttt{Num $r$}  is interpreted as the number $r$.
+  \end{enumerate}
+\item In order to be able to convert an arithmetic expression into a string, we turn \texttt{Expr} into an
+  instance of the type class \texttt{show} in line 12 and define the function \texttt{show} via matching for all the
+  different cases of the given arithmetic expression.
+
+  In order for the implementation to be concise, the result of calling \texttt{show $s$} has more parentheses
+  than necessary.
+\item Given an arithmetic expression $e$ and the name of a variable $c$, the function call
+  \\[0.2cm]
+  \hspace*{1.3cm}
+  \texttt{diff $e$ $c$}
+  \\[0.2cm]
+  computes the derivative of $e$ with respect to $c$.  For example, line 29 implements the product rule.
+\end{enumerate}
+
 
 %%% Local Variables:
 %%% mode: latex
