@@ -11,6 +11,6 @@ evaluate False = "Error"   :✗: "Some tests failed"
 -- Example usage
 main :: IO ()
 main = do
-    print (evaluate True)   -- Output: "Success" ✓ "All tests passed"
-    print (evaluate False)  -- Output: "Error" ✗ "Some tests failed"
+    print (evaluate True)   -- Output: "Success" :✓: "All tests passed"
+    print (evaluate False)  -- Output: "Error" :✗: "Some tests failed"
 

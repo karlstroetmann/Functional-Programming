@@ -15,12 +15,58 @@ an idea about what to expect.  \textsl{Haskell} has the following properties:
   \blue{first class citiziens}:
   \begin{enumerate}
   \item A function can be given as an argument to another function.
-  \item A function can be produce a function as its result.
+  \item A function can return a function as its result.
   \end{enumerate}
-  A well known programming language that supports functional programming is \textsl{Python} and there are
-  several books discussing functional programming in \textsl{Python}, e.g.~\cite{lott:2022}, \cite{mertz:2015},
-  and \cite{reid:2023}.  
+  Of course, Haskell is not the only functional programming language.
+  \begin{enumerate}
+  \item The first functional programming language is \blue{Lisp} (Tiobe index: 23), which is short for
+        \textit{\underline{Lis}t \underline{P}rocessing}. 
+        It was developed in 1958 by John McCarthy at the Massachusetts Institute of Technology (MIT). 
+        Lisp introduced many groundbreaking concepts, such as \blue{garbage collection}, \blue{dynamic typing},
+        and \blue{higher-order functions}. A dialect of Lisp is \blue{Scheme}, which is a typed version of Lisp.
+  \item \href{https://en.wikipedia.org/wiki/ML_(programming_language)}{ML} (Tiobe index: 46), short for
+        \textit{Meta Language}, is a general-purpose functional programming language 
+        developed in the 1970s by Robin Milner and others at the University of Edinburgh. It was originally
+        designed as part of the \textit{LCF theorem-proving system} to facilitate automated reasoning and formal
+        verification.  ML introduced several influential features, including static type inference, pattern
+        matching, and parametric polymorphism.  An important dialect of ML is
+        \href{https://en.wikipedia.org/wiki/OCaml}{OCaml} (objective Caml, Caml is short for Cambridge ML).  ML
+        is widely used in academia and 
+        industry for compiler design, formal methods, and functional programming.
+  \item \href{https://en.wikipedia.org/wiki/F_Sharp_(programming_language)}{\blue{\texttt{F\#}}} is a strongly-typed,
+        functional-first programming language developed by Microsoft Research 
+        and first released in 2005. It is part of the \href{https://en.wikipedia.org/wiki/.NET_Framework}{.NET}
+        ecosystem and combines functional, imperative, and object-oriented programming paradigms.  \texttt{F\#}
+        is influenced by OCaml and other functional languages, offering 
+        features such as type inference, pattern matching, immutability, and asynchronous programming. It also
+        supports interoperability with other .NET languages like
+        \href{https://en.wikipedia.org/wiki/C_Sharp_(programming_language)}{\texttt{C\#}} and 
+        \href{https://en.wikipedia.org/wiki/.NET_Framework}{\texttt{VB.NET}}. \texttt{F\#} is widely used for data
+        analysis, scientific computing, and financial modeling due to its concise syntax and powerful
+        abstractions.
 
+        \texttt{F\#} has been designed by Don Syme.
+        
+  \item \href{https://en.wikipedia.org/wiki/Scala_(programming_language)}{Scala}
+        a modern programming language launched in 2004 by Martin Odersky is notable for the following features:
+        \begin{itemize}
+        \item \textsl{Scala} is a multi-paradigm langauge as it supports both functional and object-oriented
+              programming. 
+        \item It runs on the Java Virtual Machine and therefore allows seamless use of Java libraries and
+              tools. Therefore it enables calling Java code and being called by Java.
+        \item Similar to \textsl{Haskell} it features a strong, static type system with type inference.
+        \item It includes support for concurrency.
+        \item It uses a concise syntax with reduced boilerplate code, although the syntax is not as concise as
+              the syntax of \textsl{Haskell}.
+        \end{itemize}
+  \item Many modern programming languages support functional programming.  For example,
+        \href{https://en.wikipedia.org/wiki/Python_(programming_language)}{Python} (Tiobe index: 1) 
+        can be used as a functional programming language.  It supports higher order functions, garbage
+        collection, matching, lambda expressions, list comprehensions, closures, iterators, decorators, and
+        provides libraries like \texttt{functools} and \texttt{itertools} that support functional programming.
+        The following books discuss functional programming in \textsl{Python}: \cite{lott:2022}, \cite{mertz:2015},
+        and \cite{reid:2023}.         
+  \end{enumerate}
 \item \textsl{Haskell} is \blue{statically typed}.
 
   Every variable in Haskell has a fixed type, which can not be changed.  In this respect, \textsl{Haskell} is
@@ -29,9 +75,12 @@ an idea about what to expect.  \textsl{Haskell} has the following properties:
   \blue{inferred} by the type system.  Therefore, in Haskell we usually specify only the types of non-trivial
   functions.
 
-  The benefit of this approach is that many type errors will already be caught by the compiler.  This is in
-  contrast to programs written in a dynamically typed language like \textsl{Python}, where type errors are only
-  discovered at runtime.
+  The benefit of this approach is that \textsl{Haskell} programs are much more concise than the corresponding
+  \textsl{Java} programs, while the type errors will still be caught by the compiler.  This is in
+  contrast to programs written in a dynamically typed language like \textsl{Python}: Similar to
+  \textsl{Haskell} programs, \textsl{Python} programs are quite concise, but type errors are only
+  discovered at runtime.  Therefore, programming in \textsl{Python} is quite unsafe when compared to
+  programming in \textsl{Haskell}.
 
 \item \textsl{Haskell} is a \blue{pure} functional programming language.
 
@@ -40,10 +89,8 @@ an idea about what to expect.  \textsl{Haskell} has the following properties:
   same elements as the old list and which, furthermore, is sorted.
 
   The property of being a \blue{pure} language sets \textsl{Haskell} apart from most other programming
-  languages.  Even the language
-  \href{https://en.wikipedia.org/wiki/Scala_(programming_language)}{\textsl{Scala}}, which is designed as a
-  modern functional programming language, is not pure.
-
+  languages.
+  
   What is the big deal about purity?  On one hand, it forces
   the user to program in a declarative style.  Although, in general, nobody likes to be forced to do something,
   there is a huge benefit in pure programming.
@@ -64,16 +111,95 @@ an idea about what to expect.  \textsl{Haskell} has the following properties:
   
 \item \textsl{Haskell} is a \blue{compiled} language similar to \textsl{Java} and \texttt{C}, but additionally
   offers an interpreter.  Having an interpreter is beneficial for rapid prototyping.  The property that
-  \textsl{Haskell} programs can be compiled ensures that the resulting programs can befaster than,
+  \textsl{Haskell} programs can be compiled ensures that the resulting programs can be faster than,
   for example, \textsl{Python} programs.
-\item \textsl{Haskell} is a \blue{lazy} language.  The programming language \texttt{C} is an \blue{eager}
-  language.  If an expression  of the form
+
+  To make this claim concrete, consider the \textsl{Python} program shown in Figure \ref{fig:fibonacci.py} on
+  page \pageref{fig:fibonacci.py} to compute the
+  \href{https://en.wikipedia.org/wiki/Fibonacci_numbers}{Fibonacci numbers}.  The Fibonacci sequence
+  $(F_n)_{n\in\mathbb{N}}$ is defined inductively:
+  \\[0.2cm]
+  \hspace*{1.3cm}
+  $F_0 = 0$, $F_1 = 1$, and $F_{n+2} = F_{n+1}  + F_n$
+  \\[0.2cm]
+  The algorithm implemented in Figure \ref{fig:fibonacci.py} is 
+  deliberately inefficient.  On my Mac Studio of 2022 the \textsl{Python} program takes about 11.40 seconds to
+  compute the $40^{\mathrm{th}}$ Fibonacci number.
+
+\begin{figure}[!ht]
+\centering
+\begin{minted}[ frame         = lines, 
+                 framesep      = 0.3cm, 
+                 firstnumber   = 1,
+                 bgcolor       = bg,
+                 numbers       = left,
+                 numbersep     = -0.2cm,
+                 xleftmargin   = 0.8cm,
+                 xrightmargin  = 0.8cm,
+               ]{python3}
+    def fib(n):
+        if n == 0:
+            return 0
+        elif n == 1:
+            return 1
+        else:
+            return fib(n - 1) + fib(n - 2)
+    
+    if __name__ == "__main__":
+        n = 40  # Calculate the 40th Fibonacci number
+        print(fib(n))
+\end{minted}
+\vspace*{-0.3cm}
+\caption{Computing the Fibonnacci numbers in Python.}
+\label{fig:fibonacci.py}
+\end{figure}
+
+    In contrast, Figure \ref{fig:fibonacci.hs} on page \pageref{fig:fibonacci.hs} shows a \textsl{Haskell}
+    implementation of the same inefficient algorithm.  If we compile this program with
+    \\[0.2cm]
+    \hspace*{1.3cm}
+    \texttt{ghc -O2 fibonacci.hs}
+    \\[0.2cm]
+    then the program runs in 0.62 seconds, which is more than 18 times faster.
+
+    Admittedly, the \texttt{C} implementation runs in 0.33 seconds and is about twice as fast as
+    \textsl{Haskell}.  A \textsl{Java} implementation is as fast as the \texttt{C} implementation.
+\begin{figure}[!ht]
+\centering
+\begin{minted}[ frame         = lines, 
+                 framesep      = 0.3cm, 
+                 firstnumber   = 1,
+                 bgcolor       = bg,
+                 numbers       = left,
+                 numbersep     = -0.2cm,
+                 xleftmargin   = 0.8cm,
+                 xrightmargin  = 0.8cm,
+               ]{haskell}
+    fib :: Int -> Int
+    fib 0 = 0
+    fib 1 = 1
+    fib n = fib (n - 1) + fib (n - 2)
+    
+    main :: IO ()
+    main = do
+        let n = 40  -- Calculate the 40th Fibonacci number
+        print (fib n)
+\end{minted}
+\vspace*{-0.3cm}
+\caption{Computing the Fibonnacci numbers in Haskell}
+\label{fig:fibonacci.hs}
+\end{figure}
+
+  
+\item \textsl{Haskell} is a \blue{lazy} language.  In contrast, most other programming languages like
+  \texttt{C}, \textsl{Python}, and \textsl{Java} use an \blue{eager} evaluation strategy, which works as follows:
+  If an expression  of the form
   \\[0.2cm]
   \hspace*{1.3cm}
   $f(a_1, \cdots, a_n)$
   \\[0.2cm]
   has to be evaluated, first the subexpressions $a_1$, $\cdots$ $a_n$ are evaluated.  Let us assume that $a_i$
-  is evaluated to to value $x_i$.  The, $f(x_1, \cdots, x_n)$ is computed.  This might be very inefficient.
+  is evaluated to to value $x_i$.  Then, $f(x_1, \cdots, x_n)$ is computed.  This might be very inefficient.
   Consider the example shown in Figure \ref{fig:eager.c} on page \pageref{fig:eager.c}.
 
 \begin{figure}[!ht]
@@ -108,13 +234,23 @@ needs to be evaluated and that the computation of \texttt{g(1)} is very expensiv
 \texttt{C}-program, the expressions and \texttt{h(0)} and \texttt{g(1)} will be both evaluated.  If it turns out that
 \texttt{h(0)} is \texttt{2}, then the evaluation of \texttt{g(1)} is not really necessary.  Nevertheless, in \texttt{C} this
 evaluation takes place because \texttt{C} has an \blue{eager} evaluation strategy.  In contrast, an equivalent
-\textsl{Haskell} would not evaluate the expression \texttt{h(0)} and hence would be much more efficient.
-
+\textsl{Haskell} program would not evaluate the expression \texttt{h(0)} and hence would be much more efficient.
+\item \textsl{Haskell} has influenced the design of many modern programming languages. To take one example,
+      the programming language \href{https://en.wikipedia.org/wiki/Rust_(programming_language)}{Rust} has been
+      heavyly influenced by Haskell as acknowledged by the Rust developers on this
+      \href{https://doc.rust-lang.org/reference/influences.html}{site}.
+      \begin{enumerate}
+      \item The \blue{type classes} and \blue{type families} are implemented in Rust as
+            \blue{traits}.
+      \item \textsl{Haskell} has inherited algebraic data types, pattern matching, and type inference from
+            the functional programming language ML discussed above.  These features have also found their way
+            into Rust
+      \end{enumerate}
 \item \textsl{Haskell} is difficult to learn.
 
   You might ask yourself why \textsl{Haskell} hasn't been adopted more widely.  After all, it has all these
   cool features mentioned above.  The reason is that learning \textsl{Haskell} is a lot more difficult then
-  learning a language like \textsl{Python} or \textsl{Java}.  There are two reasons for this:
+  learning a language like \textsl{Python} or \textsl{Java}.  
   \begin{enumerate}[(a)]
   \item First, \textsl{Haskell} differs a lot from those languages that most people know.
   \item In order to be very concise, the syntax of \textsl{Haskell} is quite different from the syntax of
@@ -122,22 +258,25 @@ evaluation takes place because \texttt{C} has an \blue{eager} evaluation strateg
   \item \textsl{Haskell} requires the programmer to think on a very high level of abstraction.
         Many students find this difficult.
   \item Lastly, and most importantly, \textsl{Haskell} supports the use of a number of concepts
-        like, e.g.~\href{https://en.wikipedia.org/wiki/Functor}{functors} and
+        like, e.g.~\href{https://en.wikipedia.org/wiki/Functor}{functors},
+        \href{https://en.wikipedia.org/wiki/Applicative_functor}{applicatives}, and
         \href{https://en.wikipedia.org/wiki/Monad_(category_theory)}{monads} from 
         \href{https://en.wikipedia.org/wiki/Category_theory}{category theory}. 
-        It takes both time and mathematical maturity to really understand these concepts.
+        It takes both time and mathematical maturity to grasp these concepts.
 
         If you really want to understand the depth of \textsl{Haskell}, you have to dive into those topics.
-        That said, while you have to understands both functors and monads, you do not have to understand
-        category theory.
+        That said, while it is beneficial to understand functors, applicatives, and monads, you do not have to
+        understand category theory.
   \item Fortunately, it is possible to become productive in \textsl{Haskell} without understanding 
-        functors and monads.  Therefore, this lecture will focuss on those parts of \textsl{Haskell} that are more easily
-        accessible. 
+        functors, applicatives, and monads.  Therefore, this lecture will focuss on those parts of
+        \textsl{Haskell} that are more easily accessible. 
   \end{enumerate}
 \end{enumerate}
+Haskell was first released in 1990. It was developed by a committee of researchers.  The language has since
+evolved through multiple versions, with Haskell 98 and Haskell 2010 serving as major milestones.
 
 \section{A First Taste of Haskell}
-\subsubsection{Computing All Prime Numbers}
+To get a taste of Haskell we will start by computing the set of all prime numbers.
 A \href{https://en.wikipedia.org/wiki/Prime_number}{prime number} is a natural number $p$ that is different from $1$
 and that can not be written as a product of two natural numbers $a$ and $b$ that are both different from $1$.  If
 we denote the set of all prime numbers with the symbol $\mathbb{P}$, we therefore have:
@@ -209,19 +348,19 @@ We will now compute the set of all primes less or equal than 30 using the Sieve 
                  xleftmargin   = 0.8cm,
                  xrightmargin  = 0.8cm,
                ]{python3}
-def sieve_of_eratosthenes(n):
-    """Return a list of prime numbers up to n (inclusive)."""
-    if n < 2:
-        return []    
-    is_prime = [True] * (n + 1)
-    is_prime[0] = is_prime[1] = False  # 0 and 1 are not primes
-    p = 2
-    while p * p <= n:
-        if is_prime[p]:
-            for i in range(p * p, n + 1, p):
-                is_prime[i] = False
-        p += 1
-    return [i for i, prime in enumerate(is_prime) if prime]
+    def sieve_of_eratosthenes(n):
+        """Return a list of prime numbers up to n (inclusive)."""
+        if n < 2:
+            return []    
+        is_prime = [True] * (n + 1)
+        is_prime[0] = is_prime[1] = False  # 0 and 1 are not primes
+        p = 2
+        while p * p <= n:
+            if is_prime[p]:
+                for i in range(p * p, n + 1, p):
+                    is_prime[i] = False
+            p += 1
+        return [i for i, prime in enumerate(is_prime) if prime]
 \end{minted}
 \vspace*{-0.3cm}
 \caption{A \textsl{Python program to compute the prime numbers up to $n$.}}
@@ -256,7 +395,7 @@ of $a$ or, if $a$ is not prime, of multiples of whatever prime is contained in $
     sieve (p:ns) = p : sieve [n | n <- ns, mod n p /= 0]
 \end{minted}
 \vspace*{-0.3cm}
-\caption{Computing the prime numbers.}
+\caption{Computing the prime numbers in \textsl{Haskell}.}
 \label{fig:primes.hs}
 \end{figure}
 

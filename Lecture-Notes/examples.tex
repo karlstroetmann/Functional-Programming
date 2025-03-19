@@ -925,8 +925,8 @@ We discuss this program line by line.
       where fs = diff f x
     diff (Ln f) x = (Div fs f)
       where fs = diff f x
-    diff (Var v) x   = if v == x then Num 1 else Num 0
-    diff (Num _) _   = Num 0
+    diff (Var v) x = if v == x then Num 1 else Num 0
+    diff (Num _) _ = Num 0
 \end{minted}
 \vspace*{-0.3cm}
 \caption{Symbolic differentiation.}
