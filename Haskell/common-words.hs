@@ -1,6 +1,7 @@
 import Data.List (sort, words, dropWhileEnd)
 import Data.Char (isAlpha, toLower)
 import Text.Printf (printf)
+import qualified Data.Set as Set
 
 type Text = [Char]
 type Word = [Char]
@@ -48,13 +49,14 @@ comnWrds n b = concatMap (showFreq (maximum (map (length . snd) wf))) wf
     wf = divide nw . take n . reverse . sort . countRuns . sort $ aw
     aw = (myWords . map toLower) b
     nw = length aw
-                 
--- Reads a file and returns its content.
-readBook :: FilePath -> IO String
-readBook filename = readFile filename
 
+-- find the number of distinct words
+numDistinctWords :: String -> Int
+numDistinctWords = Set.size . Set.fromList . myWords 
+         
 -- Reads the book "Moby Dick", computes the 100 most common words, and outputs them.
 main :: IO ()
 main = do
-    contents <- readBook "moby-dick.txt"
+    contents <- readFile "moby-dick.txt"
     putStrLn $ comnWrds 100 contents
+    putStrLn $ "number of distinct words: " ++ show (numDistinctWords contents)

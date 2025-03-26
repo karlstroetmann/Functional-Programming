@@ -4,10 +4,11 @@ In this Chapter we will present a few small example programs that that illustrat
 \section{Perfect Numbers}
 The first example shows the computation of the \blue{perfect} numbers.  A natural number $n$ is a
 \href{https://en.wikipedia.org/wiki/Perfect_number}{perfect} number if it is the sum of all its \blue{proper divisors},
-where a natural number $t$ is a proper divisor of $n$ if $t$ divides $n$ evenly, i.e. iff
+where a natural number $t$ is a proper divisor of $n$ iff $t < n$ $t$ divides $n$ evenly, i.e. iff
+$\texttt{mod}\; n\; t = 0$.  Hence a number $n$ is perfect if and only if the following holds:
 \\[0.2cm]
 \hspace*{1.3cm}
-$\texttt{mod}\; n\; t = 0$.
+$\mathtt{sum}\bigl(\{\,t \in \{1,\cdots,n-1\} \;\big|\; t < n \wedge n \,\texttt{\%}\, t = 0 \}\bigr) = n$
 \\[0.2cm]
 Figure \ref{fig:perfect.hs} on page \pageref{fig:perfect.hs} show a program to compute the list of all perfect
 numbers.  The function \texttt{isPerfect} takes a single natural number and checks whether it is perfect, while
@@ -54,7 +55,7 @@ functions that we will use.
       The type signature of \texttt{break} is:
       \\[0.2cm]
       \hspace*{1.3cm}
-      \texttt{break :: (a -> Bool) -> [a] -> ([a], [a])}
+      \texttt{break ::$\;$(a -> Bool) -> [a] -> ([a], [a])}
       \\[0.2cm]
       Therefore a call of this function has the form
       \\[0.2cm]
@@ -65,16 +66,16 @@ functions that we will use.
             determines where the list should be split. 
       \item The second argument \texttt{xs} is a list of elements of some generic type \texttt{[a]} that is to
             be split in two parts.
-      \item The function satisfies the following specification:
-            \begin{lstlisting}[style=haskellstyle, language=Haskell]
-  break p xs = (first, second)
-      where
-          first = [ x | x <- xs, not (p x) ]
-          first + second == xs
-            \end{lstlisting}
-            The return value is a pair.  The \texttt{first} component of this pair is the list of all elements
-            \texttt{x} of the list \texttt{xs} that do not satisfy the predicate \texttt{p}.  The
-            \texttt{second} component contains the remaining elements of \texttt{xs}.
+      \item The function satisfies the following specification: We have
+            \\[0.2cm]
+            \hspace*{1.3cm}
+            \texttt{break p xs = (first, second)}
+            \\[0.2cm]
+            if and only if the following holds:
+            \begin{enumerate}
+            \item \texttt{first = [ x | x <- xs, not (p x) ]}
+            \item \texttt{first + second == xs}
+            \end{enumerate}
     \end{itemize}
     For example, we have
     \\[0.2cm]
@@ -82,8 +83,10 @@ functions that we will use.
     \texttt{break (> 3) [1, 2, 3, 4, 5] = ([1, 2, 3], [4, 5])}
     \\[0.2cm]
     The function \texttt{break} scans the list from left to right.  It collects elements into the first list
-    until the predicate function returns \texttt{True}.  The second list starts from the first element where
-    the predicate \texttt{p} is satisfied.  The function \texttt{break} can be implemented as follows:
+    until the predicate function returns \texttt{True}.  The second list starts from the first element that
+    satisfies the predicate \texttt{p}.
+
+    The function \texttt{break} can be implemented as follows:
 \begin{lstlisting}[style=haskellstyle, language=Haskell]
 break _ [] = ([], [])  -- Base case: Empty list returns two empty lists
 break p (x:xs)
@@ -216,44 +219,45 @@ words s  = let s' = dropWhile isSpace s  -- drop leading whitespace
                 xleftmargin   = 0.0cm,
                 xrightmargin  = 0.0cm,
               ]{haskell}
-    import Data.List (sort, words)
-    import Data.Char (isAlpha, toLower)
-    
-    type Text = [Char]
-    
-    countRuns :: Eq a => [a] -> [(Int, a)]
-    countRuns [] = []
-    countRuns (x:xs) =
-        let (run, rest) = break (/= x) xs
-        in (1 + length run, x) : countRuns rest
-    
-    frequency :: Int -> Int -> Double
-    frequency c n = fromIntegral c / fromIntegral n 
-    
-    divide :: Int -> [(Int, a)] -> [(Double, a)]
-    divide n ps = [(frequency c n, x) | (c, x) <- ps]
-    
-    myWords :: String -> [String]
-    myWords = map (filter isAlpha) . words
-    
-    showPair :: (Double, String) -> String 
-    showPair (f, w) = w ++ ": " ++ show f ++ "\n"
-    
-    comnWrds :: Int -> Text -> String
-    comnWrds n b = concatMap showPair $
-                   divide nw . take n . reverse . sort . countRuns . sort $
-                   aw
-      where
-        aw = (myWords . map toLower) b
-        nw = length aw
-                     
-    readBook :: FilePath -> IO String
-    readBook filename = readFile filename
-    
-    main :: IO ()
-    main = do
-        contents <- readBook "moby-dick.txt"
-        putStrLn $ comnWrds 100 contents
+  import Data.List (sort, words)
+  import Data.Char (isAlpha, toLower)
+  import qualified Data.Set as Set
+
+  type Text = [Char]
+  
+  countRuns :: Eq a => [a] -> [(Int, a)]
+  countRuns [] = []
+  countRuns (x:xs) =
+      let (run, rest) = break (/= x) xs
+      in (1 + length run, x) : countRuns rest
+  
+  frequency :: Int -> Int -> Double
+  frequency c n = fromIntegral c / fromIntegral n 
+  
+  divide :: Int -> [(Int, a)] -> [(Double, a)]
+  divide n ps = [(frequency c n, x) | (c, x) <- ps]
+  
+  myWords :: String -> [String]
+  myWords = map (filter isAlpha) . words
+  
+  showPair :: (Double, String) -> String 
+  showPair (f, w) = w ++ ": " ++ show f ++ "\n"
+  
+  comnWrds :: Int -> Text -> String
+  comnWrds n b = concatMap showPair $
+                 divide nw . take n . reverse . sort . countRuns . sort $ aw
+    where
+      aw = (myWords . map toLower) b
+      nw = length aw
+
+  numDistinctWords :: String -> Int
+  numDistinctWords = Set.size . Set.fromList . myWords 
+      
+  main :: IO ()
+  main = do
+      contents <- readFile "moby-dick.txt"
+      putStrLn $ comnWrds 100 contents
+      putStrLn $ "number of distinct words: " ++ show (numDistinctWords contents)
 \end{minted} 
 \vspace*{-0.3cm}
 \caption{Finding the most common words, \texttt{part \texttt{I}}.}
@@ -265,7 +269,7 @@ We proceed to discuss the program that is shown in Figure \ref{fig:common-words.
 \pageref{fig:common-words.hs}. 
 \begin{enumerate}
 \item In line 1, we import the functions \texttt{sort} and \texttt{words} from the module \texttt{Data.List}. 
-\item Similarly, we import \texttt{isAlpha} and \texttt{toLower} in line 2.
+\item Similarly, we import \texttt{isAlpha} and \texttt{toLower} in line 2 form the module \texttt{Data.Char}.
 \item The function \texttt{countRuns} takes a sorted list of elements of type \texttt{a}
       and returns a list of pairs.  Each pair consists of a unique element from the input list
       and the count of its consecutive occurrences (runs).
@@ -340,8 +344,8 @@ We proceed to discuss the program that is shown in Figure \ref{fig:common-words.
       \item The function \texttt{countRuns} counts the frequency of each words.  It transforms the sorted list
             of words into a list of pairs of the form
             \\[0.2cm]
-            \hspace*{1.3cm}
-            \texttt{[(1, "abasement"), (1, "abandonedly"), ... (981, "of"), (1073, "the"), ...]}
+            \hspace*{-0.5cm}
+            \texttt{[(1,"abasement"), (1,"abandonedly"), ..., (981,"of"), (1073,"the"), ...]}
             \\[0.2cm]
             In these pairs, the first component is the number of occurrences of the corresponding word.
             This list is the sorted ascendingly according to the number of occurrences.  
@@ -482,7 +486,7 @@ Let us explain this definition in detail:
       with.  Therefore, $b$ is a subset of $s$ and hence an element of the power set
       of $s$. 
 \item Then  $s \backslash b$ is the set of objects that are left on the left side of the river after
-      the boat has crossedthe river.  Of course, the new state $s \backslash b$ has to be a state that does not
+      the boat has crossed the river.  Of course, the new state $s \backslash b$ has to be a state that does not
       have a problem.  Therefore, we check that $s \backslash b$ is an element of the set of states $Q$.
 \item Furthermore, the farmer has to be in the boat.  This explains the condition 
       \\[0.2cm]

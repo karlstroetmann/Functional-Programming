@@ -4,7 +4,7 @@ import Bfs (search)
 import SetUtils (power, (∈), (∉))
   
 -- Define the problem
-problem :: Set String → Bool
+problem :: Set String -> Bool
 problem s = "farmer" ∉ s &&
             (("goat" ∈ s && "cabbage" ∈ s) ||  -- goat eats cabbage
              ("wolf" ∈ s && "goat"    ∈ s))    -- wolf eats goat
@@ -13,7 +13,7 @@ problem s = "farmer" ∉ s &&
 allItems :: Set String
 allItems = fromList ["farmer", "wolf", "goat", "cabbage"]
 
-noProblem :: Set String → Bool
+noProblem :: Set String -> Bool
 noProblem s = not (problem s) && not (problem $ allItems \\ s)
 
 -- Define all valid states (in this case, subsets of `allItems`)
@@ -22,13 +22,13 @@ states = Data.Set.filter noProblem (power allItems)
 
 -- Generate relations r1 and r2
 r1 :: [(Set String, Set String)]
-r1 = [ (s, s \\ b) | s ← toList states,
-                     b ← toList $ power s, s \\ b ∈ states,
+r1 = [ (s, s \\ b) | s <- toList states,
+                     b <- toList $ power s, s \\ b ∈ states,
                      "farmer" ∈ b, length b <= 2
      ]
 
 r2 :: [(Set String, Set String)]
-r2 = [ (s1, s2) | (s2, s1) ← r1 ]
+r2 = [ (s1, s2) | (s2, s1) <- r1 ]
 
 -- Combine the relations
 r :: [(Set String, Set String)]
