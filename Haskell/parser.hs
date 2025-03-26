@@ -46,7 +46,6 @@ item = P (\s -> case s of
                   []     -> []
                   (x:xs) -> [(x, xs)])
                   
-
 -- turn `Parser` into a `Functor`
 instance Functor Parser where
   -- fmap :: (a -> b) -> Parser a -> Parser b

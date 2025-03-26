@@ -51,13 +51,17 @@ prettyPrint (Ln  e) = "ln("  ++ prettyPrint e ++ ")"
 -- symbolic differentiation
 diff :: Expr → Char → Expr
 diff (Add f g) x = Add fs gs
-  where fs = diff f x; gs = diff g x
+  where fs = diff f x
+        gs = diff g x
 diff (Sub f g) x = Sub fs gs
-  where fs = diff f x; gs = diff g x
+  where fs = diff f x
+        gs = diff g x
 diff (Mul f g) x = Add (Mul fs g) (Mul f gs)
-  where fs = diff f x; gs = diff g x
+  where fs = diff f x
+        gs = diff g x
 diff (Div f g) x = Div (Sub (Mul fs g) (Mul f gs)) (Mul g g)
-  where fs = diff f x; gs = diff g x
+  where fs = diff f x
+        gs = diff g x
 diff (Pow f g) x = diff (Exp (Mul g (Ln f))) x 
 diff (Exp f) x = Mul (Exp f) fs
   where fs = diff f x

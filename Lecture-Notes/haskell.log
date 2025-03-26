@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.5.31)  26 MAR 2025 16:54
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.5.31)  26 MAR 2025 17:01
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
@@ -1552,7 +1552,7 @@ mf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/local/texlive/2024
 /texmf-dist/fonts/type1/public/cm-super/sfrm1095.pfb></usr/local/texlive/2024/t
 exmf-dist/fonts/type1/public/cm-super/sftt0900.pfb></usr/local/texlive/2024/tex
 mf-dist/fonts/type1/public/cm-super/sftt1095.pfb>
-Output written on haskell.pdf (51 pages, 654742 bytes).
+Output written on haskell.pdf (51 pages, 654448 bytes).
 PDF statistics:
  1267 PDF objects out of 1440 (max. 8388607)
  1142 compressed objects within 12 object streams

@@ -19,7 +19,6 @@ placeQueens n row = do
 solveNQueens :: Int -> [[Int]]
 solveNQueens n = placeQueens n n
 
-
 -- Everything below is I/O
 
 -- Display a single board for a given solution
